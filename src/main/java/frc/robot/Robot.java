@@ -10,7 +10,6 @@ import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.system.DataLogManager;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.TimedRobot;
-import org.wpilib.livewindow.LiveWindow;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
@@ -39,9 +38,6 @@ public class Robot extends TimedRobot {
         .withJoystickReplay();
 
     public Robot() {
-        // Disable the LiveWindow telemetry to lower the network load
-        LiveWindow.disableAllTelemetry();
-
         // Enable local logging.
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
@@ -145,16 +141,10 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopExit() {}
 
-    @Override
-    public void testInit() {
-        CommandScheduler.getInstance().cancelAll();
-    }
-
-    @Override
-    public void testPeriodic() {}
-
-    @Override
-    public void testExit() {}
+    // @Override
+    // public void testInit() {
+    //     CommandScheduler.getInstance().cancelAll();
+    // }
 
     @Override
     public void simulationPeriodic() {}
