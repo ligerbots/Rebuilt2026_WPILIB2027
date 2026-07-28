@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.util.Units;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.smartdashboard.SmartDashboard;
@@ -41,7 +41,7 @@ public class Shoot extends Command {
     private final Shooter m_shooter;
     private final Turret m_turret;
     private final ShooterFeeder m_feeder;
-    private final Supplier<ChassisSpeeds> m_speedsSupplier;
+    private final Supplier<ChassisVelocities> m_speedsSupplier;
     private final Supplier<Pose2d> m_poseSupplier;
 
     private final Shooter.ShotType m_shotType;
@@ -67,7 +67,7 @@ public class Shoot extends Command {
     private static final double TRENCH_X_TOLERANCE = Units.inchesToMeters(12.0);
 
     private Shoot(Shooter shooter, Turret turret, ShooterFeeder feeder,
-            Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speeds,
+            Supplier<Pose2d> poseSupplier, Supplier<ChassisVelocities> speeds,
             Shooter.ShotType shotType, double shotDistanceInches, Rotation2d turretHeading) {
         m_turret = turret;
         m_shooter = shooter;
@@ -90,13 +90,13 @@ public class Shoot extends Command {
     }
 
     public Shoot(Shooter shooter, Turret turret, ShooterFeeder feeder,
-            Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speeds, Shooter.ShotType shotType) {
+            Supplier<Pose2d> poseSupplier, Supplier<ChassisVelocities> speeds, Shooter.ShotType shotType) {
         this(shooter, turret, feeder,
                 poseSupplier, speeds, shotType, 0.0, Rotation2d.kZero);
     }
 
     public Shoot(Shooter shooter, Turret turret, ShooterFeeder feeder,
-                Supplier<Pose2d> poseSupplier, Supplier<ChassisSpeeds> speeds, 
+                Supplier<Pose2d> poseSupplier, Supplier<ChassisVelocities> speeds, 
                 double shotDistanceInches, Rotation2d turretHeading) {
         this(shooter, turret, feeder,
                 poseSupplier, speeds, ShotType.FIXED, shotDistanceInches, turretHeading);
@@ -351,27 +351,27 @@ public class Shoot extends Command {
     public Translation2d findMovingShotVector(Pose2d currentPose, Translation2d target, ShotType effectiveShotType) {
         // SmartDashboard.putString("shoot/effectiveShotType", effectiveShotType.toString());
         // SmartDashboard.putNumber("shoot/targetX", target.getX());
-        ChassisSpeeds speedInformation = m_speedsSupplier.get();
-        Translation2d robotVelVector = new Translation2d(speedInformation.vxMetersPerSecond, speedInformation.vyMetersPerSecond);
+        ChassisVelocities speedInformation = m_speedsSupplier.get();
+        Translation2d robotVelVector = new Translation2d(speedInformation.vx, speedInformation.vy);
 
         SmartDashboard.putNumber("shoot/robotVel", robotVelVector.getNorm());
-        SmartDashboard.putNumber("shoot/robotOmega", speedInformation.omegaRadiansPerSecond);
+        SmartDashboard.putNumber("shoot/robotOmega", speedInformation.omega);
 
         Pose2d futureRobotPose = new Pose2d(
             currentPose.getTranslation().plus(robotVelVector.times(LATENCY_SECONDS_TRANSLATION)),
-            currentPose.getRotation().plus(Rotation2d.fromRadians(speedInformation.omegaRadiansPerSecond * LATENCY_SECONDS_ROTATION))
+            currentPose.getRotation().plus(Rotation2d.fromRadians(speedInformation.omega * LATENCY_SECONDS_ROTATION))
         );
 
         // Centripetal Velocity Calculator
         // This is the speed of the turret caused by the robot rotating
-        double turretCentripetalSpeed = Math.abs(speedInformation.omegaRadiansPerSecond) * Turret.TURRET_OFFSET.getNorm();
+        double turretCentripetalSpeed = Math.abs(speedInformation.omega) * Turret.TURRET_OFFSET.getNorm();
 
         // net field direction of the "centripetal" velocity
         // do the sum directly to save some object constructors
         Rotation2d turretCentripetalDirection = Rotation2d.fromDegrees(
                 futureRobotPose.getRotation().getDegrees() + 
                 Turret.TURRET_OFFSET.getAngle().getDegrees() +
-                Math.copySign(90.0, speedInformation.omegaRadiansPerSecond));
+                Math.copySign(90.0, speedInformation.omega));
         
         Translation2d centripetalVelocity = new Translation2d(turretCentripetalSpeed, turretCentripetalDirection);
         // Translation2d centripetalVelocity = Translation2d.kZero;
@@ -458,8 +458,8 @@ public class Shoot extends Command {
     
     //returns true if robot is going under the trench
     private boolean inTrenchZone(Translation2d robotTranslation) {
-        ChassisSpeeds speedInformation = m_speedsSupplier.get();
-        Translation2d velocity = new Translation2d(speedInformation.vxMetersPerSecond, speedInformation.vyMetersPerSecond);
+        ChassisVelocities speedInformation = m_speedsSupplier.get();
+        Translation2d velocity = new Translation2d(speedInformation.vx, speedInformation.vy);
         // robot position after TRENCH_SPEED_TIME_SEC, given current velocity
         Translation2d nextRobotTranslation = robotTranslation.plus(velocity.times(TRENCH_SPEED_TIME_SEC));
 

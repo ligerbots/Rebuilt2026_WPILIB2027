@@ -26,7 +26,7 @@ import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.system.Timer;
@@ -585,7 +585,7 @@ public class RobotContainerCompBot extends RobotContainer {
         double startingSpeedMps = path.getIdealStartingState() != null ? path.getIdealStartingState().velocityMPS() : 0.0;
         Rotation2d pathHeading = getPathHeading(path);
         Translation2d fieldVelocity = new Translation2d(startingSpeedMps, pathHeading);
-        ChassisSpeeds startingSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        ChassisVelocities startingSpeeds = ChassisVelocities.fromFieldRelativeSpeeds(
             fieldVelocity.getX(),
             fieldVelocity.getY(),
             0.0,

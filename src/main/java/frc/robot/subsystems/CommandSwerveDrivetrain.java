@@ -18,7 +18,7 @@ import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.linalg.Matrix;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
@@ -348,13 +348,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return getState().Pose;
     }
 
-    public ChassisSpeeds getRobotCentricSpeeds() {
+    public ChassisVelocities getRobotCentricSpeeds() {
         return getState().Speeds;
     }
 
-    public ChassisSpeeds getFieldCentricSpeeds() {
+    public ChassisVelocities getFieldCentricSpeeds() {
         SwerveDriveState state = getState();
-        return ChassisSpeeds.fromRobotRelativeSpeeds(state.Speeds, state.Pose.getRotation());
+        return ChassisVelocities.fromRobotRelativeSpeeds(state.Speeds, state.Pose.getRotation());
     }
 
     /**
@@ -417,12 +417,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     this::getPose,   
                     // Method to reset odometry (will be called if your auto has a starting pose)
                     this::resetPose,
-                    // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                    // ChassisVelocities supplier. MUST BE ROBOT RELATIVE
                     () -> this.getState().Speeds,
-                    // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also
+                    // Method that will drive the robot given ROBOT RELATIVE ChassisVelocities. Also
                     // optionally outputs individual module feedforwards
                     (speedsRobotRelative, moduleFeedForwards) -> {
-                        // Consumer of ChassisSpeeds to drive the robot
+                        // Consumer of ChassisVelocities to drive the robot
                         this.setControl(autoRequest.withSpeeds(speedsRobotRelative));
                     },
                     // PPHolonomicController is the built in path following controller for holonomic

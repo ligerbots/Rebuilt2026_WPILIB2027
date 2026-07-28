@@ -11,7 +11,7 @@ import static org.wpilib.units.Units.Amps;
 import java.util.function.Supplier;
 
 import org.wpilib.command2.SubsystemBase;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.units.measure.Current;
 
@@ -43,13 +43,13 @@ public class Hopper extends SubsystemBase {
     private static final double FEED_COMP_MAX_RPM = 1000.0;
     
     private final TalonFX m_motor;
-    private final Supplier<ChassisSpeeds> m_robotRelativeSpeedsSupplier;
+    private final Supplier<ChassisVelocities> m_robotRelativeSpeedsSupplier;
 
     private final VelocityVoltage m_velocityControl = new VelocityVoltage(0).withEnableFOC(true);
     private double m_goalRPM;
 
     // Creates a new Hopper
-    public Hopper(Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier) {
+    public Hopper(Supplier<ChassisVelocities> robotRelativeSpeedsSupplier) {
         m_robotRelativeSpeedsSupplier = robotRelativeSpeedsSupplier;
         m_motor = new TalonFX(Constants.HOPPER_TRANSFER_CAN_ID);
 
@@ -151,7 +151,7 @@ public class Hopper extends SubsystemBase {
             return 0.0;
         }
 
-        ChassisSpeeds robotRelativeSpeeds = m_robotRelativeSpeedsSupplier.get();
+        ChassisVelocities robotRelativeSpeeds = m_robotRelativeSpeedsSupplier.get();
         if (robotRelativeSpeeds == null) {
             return 0.0;
         }
