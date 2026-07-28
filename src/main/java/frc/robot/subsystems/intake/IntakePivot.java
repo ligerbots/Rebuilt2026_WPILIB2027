@@ -6,6 +6,7 @@ package frc.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -67,7 +68,7 @@ public class IntakePivot extends SubsystemBase {
 
     /** Creates a new IntakePivot. */
     public IntakePivot() {
-        m_motor = new TalonFX(Constants.INTAKE_DEPLOY_ID);
+        m_motor = new TalonFX(Constants.INTAKE_DEPLOY_ID, new CANBus());
         
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
                 
@@ -162,9 +163,9 @@ public class IntakePivot extends SubsystemBase {
 
     public void setBrakeMode(boolean brakeMode) {
         if (brakeMode)
-            m_motor.setNeutralMode(NeutralModeValue.Brake);
+            m_motor.configNeutralMode(NeutralModeValue.Brake);
         else
-            m_motor.setNeutralMode(NeutralModeValue.Coast);
+            m_motor.configNeutralMode(NeutralModeValue.Coast);
     }
 
     // Note: stowCommand is in Intake, since it also involves the Rollers

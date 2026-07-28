@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.controls.Follower;
@@ -63,8 +64,8 @@ public class ChainClimber extends SubsystemBase {
 
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
 
-        m_motor = new TalonFX(Constants.CHAIN_CLIMBER_MOTOR_CAN_ID);
-        m_follower = new TalonFX(Constants.CHAIN_CLIMBER_FOLLOWER_MOTOR_CAN_ID);
+        m_motor = new TalonFX(Constants.CHAIN_CLIMBER_MOTOR_CAN_ID, new CANBus());
+        m_follower = new TalonFX(Constants.CHAIN_CLIMBER_FOLLOWER_MOTOR_CAN_ID, new CANBus());
 
         //TODO find out good K values for each term
         //set slot0 for unloaded state
@@ -98,10 +99,10 @@ public class ChainClimber extends SubsystemBase {
 
         // enable brake mode (after main config)
         m_motor.getConfigurator().apply(talonFXConfigs);
-        m_motor.setNeutralMode(NeutralModeValue.Brake);
+        m_motor.configNeutralMode(NeutralModeValue.Brake);
 
         m_follower.getConfigurator().apply(talonFXConfigs);
-        m_follower.setNeutralMode(NeutralModeValue.Brake);
+        m_follower.configNeutralMode(NeutralModeValue.Brake);
         m_follower.setControl(new Follower(m_motor.getDeviceID(), null));
 
         m_motor.setPosition(0);

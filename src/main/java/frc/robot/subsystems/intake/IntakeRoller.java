@@ -8,6 +8,7 @@ package frc.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -52,7 +53,7 @@ public class IntakeRoller extends SubsystemBase {
 
     // Creates a new IntakeRollerZA
     public IntakeRoller() {
-        m_motor = new TalonFX(Constants.INTAKE_ROLLER_CAN_ID);
+        m_motor = new TalonFX(Constants.INTAKE_ROLLER_CAN_ID, new CANBus());
         
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
         Slot0Configs slot0Config = talonFXConfigs.Slot0;
@@ -72,7 +73,7 @@ public class IntakeRoller extends SubsystemBase {
         
         m_motor.getConfigurator().apply(talonFXConfigs);
         // enable brake mode (after main config)
-        m_motor.setNeutralMode(NeutralModeValue.Brake);
+        m_motor.configNeutralMode(NeutralModeValue.Brake);
     
         if (Constants.OPTIMIZE_CAN) {
             optimizeCAN();

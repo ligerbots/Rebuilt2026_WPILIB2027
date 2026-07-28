@@ -4,21 +4,22 @@
 
 package frc.robot.subsystems.shooter;
 
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
-import frc.robot.Constants;
-
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.units.measure.Current;
+
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import frc.robot.Constants;
 
 public class Hood extends SubsystemBase {
     private static final double ANGLE_TOLERANCE_DEG = 2.0;
@@ -47,7 +48,7 @@ public class Hood extends SubsystemBase {
     
     /** Creates a new Hood. */
     public Hood() {
-        m_motor = new TalonFX(Constants.HOOD_CAN_ID);
+        m_motor = new TalonFX(Constants.HOOD_CAN_ID, new CANBus());
         
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();        
         Slot0Configs slot0configs = talonFXConfigs.Slot0;

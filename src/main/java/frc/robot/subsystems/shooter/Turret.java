@@ -4,31 +4,32 @@
 //look for motor ratios
 package frc.robot.subsystems.shooter;
 
-import frc.robot.Constants;
-import frc.robot.utilities.ChineseRemainder;
-import org.wpilib.math.util.MathUtil;
+import static org.wpilib.units.Units.Amps;
+
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
-import org.wpilib.units.measure.Current;
-import org.wpilib.driverstation.DriverStation;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.units.measure.Current;
 
+import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.ctre.phoenix6.hardware.CANcoder;
 
-import static org.wpilib.units.Units.Amps;
-
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import frc.robot.Constants;
+import frc.robot.utilities.ChineseRemainder;
 
 public class Turret extends SubsystemBase {
     // public for the Shoot command - not the greatest, but a pain otherwise
@@ -92,9 +93,9 @@ public class Turret extends SubsystemBase {
         // Field is used for plotting the heading
         m_field = field;
 
-        m_turretMotor = new TalonFX(Constants.TURRET_CAN_ID);
-        m_thruboreSmall =  new CANcoder(Constants.TURRET_SMALL_CANCODER_ID);
-        m_thruboreLarge = new CANcoder(Constants.TURRET_LARGE_CANCODER_ID);
+        m_turretMotor = new TalonFX(Constants.TURRET_CAN_ID, new CANBus());
+        m_thruboreSmall =  new CANcoder(Constants.TURRET_SMALL_CANCODER_ID, new CANBus());
+        m_thruboreLarge = new CANcoder(Constants.TURRET_LARGE_CANCODER_ID, new CANBus());
         
         CANcoderConfiguration cancoderConfig = new CANcoderConfiguration();
         cancoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1.0;
@@ -356,7 +357,7 @@ public class Turret extends SubsystemBase {
             );
         } catch (Exception e) {
             // bad! log this and keep going
-            DriverStation.reportError("Exception plotting shot vectors", e.getStackTrace());
+            DriverStationErrors.reportError("Exception plotting shot vectors", e.getStackTrace());
         }
     }
 

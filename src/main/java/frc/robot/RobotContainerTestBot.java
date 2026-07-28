@@ -13,11 +13,12 @@ import java.util.List;
 import java.util.Objects;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.CommandNiDsXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
@@ -60,7 +61,7 @@ public class RobotContainerTestBot extends RobotContainer {
 
     private AutoCommandInterface m_autoCommand;
 
-    private final CommandXboxController m_driverController = new CommandXboxController(0);
+    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
     // private final CommandJoystick m_farm = new CommandJoystick(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
@@ -75,7 +76,7 @@ public class RobotContainerTestBot extends RobotContainer {
     
     public RobotContainerTestBot() {
         if (Robot.isSimulation()) {
-            DriverStation.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionWarning(true);
         }
         
         m_drivetrain = new CommandSwerveDrivetrain(

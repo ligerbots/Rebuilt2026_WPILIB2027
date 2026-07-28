@@ -14,6 +14,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.wpilib.command2.Command;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.ParallelCommandGroup;
+import org.wpilib.command2.StartEndCommand;
+import org.wpilib.command2.button.CommandJoystick;
+import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.InternalButton;
+import org.wpilib.command2.button.RobotModeTriggers;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.math.filter.SlewRateLimiter;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.smartdashboard.SendableChooser;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Timer;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.config.RobotConfig;
@@ -21,34 +42,15 @@ import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.filter.SlewRateLimiter;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.ParallelCommandGroup;
-import org.wpilib.command2.StartEndCommand;
-import org.wpilib.command2.button.CommandJoystick;
-import org.wpilib.command2.button.CommandXboxController;
-import org.wpilib.command2.button.InternalButton;
-import org.wpilib.command2.button.RobotModeTriggers;
-
-import frc.robot.commands.*;
+import frc.robot.commands.PulseHopper;
+import frc.robot.commands.Shoot;
 import frc.robot.commands.autoCommands.AutoCommandInterface;
 import frc.robot.commands.autoCommands.CoreAuto;
 import frc.robot.generated.TunerConstantsCompBot;
 import frc.robot.subsystems.AprilTagVision;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.DataLogger;
+import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Shooter.ShotType;
@@ -76,7 +78,7 @@ public class RobotContainerCompBot extends RobotContainer {
 
     private AutoCommandInterface m_autoCommand;
 
-    private final CommandXboxController m_driverController = new CommandXboxController(0);
+    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
     private final CommandJoystick m_farm = new CommandJoystick(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
@@ -116,7 +118,7 @@ public class RobotContainerCompBot extends RobotContainer {
     
     public RobotContainerCompBot() {
         if (Robot.isSimulation()) {
-            DriverStation.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionWarning(true);
         }
         
         m_drivetrain = new CommandSwerveDrivetrain(

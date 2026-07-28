@@ -6,6 +6,7 @@
 
 package frc.robot.subsystems.shooter;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -54,8 +55,8 @@ public class ShooterFeeder extends SubsystemBase {
 
     // Creates a new ShooterFeeder
     public ShooterFeeder() {
-        m_motorKicker = new TalonFX(Constants.SHOOTER_KICKER_CAN_ID);
-        m_motorFeeder = new TalonFX(Constants.SHOOTER_FEEDER_BELTS_CAN_ID);
+        m_motorKicker = new TalonFX(Constants.SHOOTER_KICKER_CAN_ID, new CANBus());
+        m_motorFeeder = new TalonFX(Constants.SHOOTER_FEEDER_BELTS_CAN_ID, new CANBus());
 
         TalonFXConfiguration kickerConfig = new TalonFXConfiguration();  
         Slot0Configs kickerSlot0Configs = kickerConfig.Slot0;
@@ -74,7 +75,7 @@ public class ShooterFeeder extends SubsystemBase {
         
         m_motorKicker.getConfigurator().apply(kickerConfig);
         // put kicker in Coast mode, so that it spins down slowly
-        m_motorKicker.setNeutralMode(NeutralModeValue.Coast);
+        m_motorKicker.configNeutralMode(NeutralModeValue.Coast);
 
         //-------
 
@@ -95,7 +96,7 @@ public class ShooterFeeder extends SubsystemBase {
 
         m_motorFeeder.getConfigurator().apply(feederConfig);
         // put feed belts in Brake mode so they stop quickly
-        m_motorFeeder.setNeutralMode(NeutralModeValue.Brake);
+        m_motorFeeder.configNeutralMode(NeutralModeValue.Brake);
 
         if (Constants.OPTIMIZE_CAN) {
             optimizeCAN();
@@ -171,7 +172,7 @@ public class ShooterFeeder extends SubsystemBase {
     }
 
     public void stopFeederBelts() {
-        m_motorFeeder.set(0);
+        m_motorFeeder.setVoltage(0);
     }
 
     public void stop(){

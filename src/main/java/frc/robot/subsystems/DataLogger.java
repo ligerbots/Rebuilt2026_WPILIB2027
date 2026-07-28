@@ -25,7 +25,7 @@ public class DataLogger extends SubsystemBase {
 
         // Network
         SmartDashboard.putNumber("network/CAN Bus Utilization",
-                RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus().percentBusUtilization);
+                RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus(0).percentBusUtilization);
 
         HubShiftUtil.ShiftInfo officialShiftInfo = HubShiftUtil.getOfficialShiftInfo();
         HubShiftUtil.ShiftInfo shiftedShiftInfo = HubShiftUtil.getShiftedShiftInfo(HubShiftUtil.getProjectileLeadTimeSec());
@@ -43,8 +43,8 @@ public class DataLogger extends SubsystemBase {
         SmartDashboard.putBoolean("shoot/hubTimingRelevant", hubTimingRelevant);
 
         // RobotLog
-        SmartDashboard.putNumber("shoot/hubShiftState", officialShiftInfo.currentShift().name());
-        SmartDashboard.putNumber("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
+        SmartDashboard.putString("shoot/hubShiftState", officialShiftInfo.currentShift().name());
+        SmartDashboard.putString("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
         SmartDashboard.putNumber("shoot/projectileLeadTimeSec", HubShiftUtil.getProjectileLeadTimeSec());
     }
 }

@@ -11,6 +11,12 @@ import static org.wpilib.units.Units.Amps;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Timer;
+import org.wpilib.units.measure.Current;
+
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -22,10 +28,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.units.measure.Current;
-import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
 
 public class Flywheel extends SubsystemBase {
@@ -65,8 +67,8 @@ public class Flywheel extends SubsystemBase {
     public Flywheel() {
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();  
         
-        m_motor = new TalonFX(Constants.FLYWHEEL_CAN_ID);
-        m_follower = new TalonFX(Constants.FLYWHEEL_FOLLOWER_CAN_ID);
+        m_motor = new TalonFX(Constants.FLYWHEEL_CAN_ID, new CANBus());
+        m_follower = new TalonFX(Constants.FLYWHEEL_FOLLOWER_CAN_ID, new CANBus());
         
         Slot0Configs slot0configs = talonFXConfigs.Slot0;
         slot0configs.kP = K_P;
@@ -84,10 +86,10 @@ public class Flywheel extends SubsystemBase {
 
         // enable coast mode (after main config)
         m_motor.getConfigurator().apply(talonFXConfigs);
-        m_motor.setNeutralMode(NeutralModeValue.Coast);
+        m_motor.configNeutralMode(NeutralModeValue.Coast);
 
         m_follower.getConfigurator().apply(talonFXConfigs);
-        m_follower.setNeutralMode(NeutralModeValue.Coast);
+        m_follower.configNeutralMode(NeutralModeValue.Coast);
         m_follower.setControl(new Follower(m_motor.getDeviceID(), MotorAlignmentValue.Opposed));
 
         // DO NOT mess with the update frequency on the motors. This can affect
@@ -120,10 +122,10 @@ public class Flywheel extends SubsystemBase {
         SmartDashboard.putNumber("flywheel/goalRPM", m_goalRPM);
 
         // Detection state
-        SmartDashboard.putNumber("flywheel/shotDetectionArmed", m_shotDetectionArmed);
-        SmartDashboard.putNumber("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
+        SmartDashboard.putBoolean("flywheel/shotDetectionArmed", m_shotDetectionArmed);
+        SmartDashboard.putBoolean("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
         SmartDashboard.putNumber("flywheel/jamGrace", m_jamGrace);
-        SmartDashboard.putNumber("flywheel/currentJamDetected", isCurrentJamDetected());
+        SmartDashboard.putBoolean("flywheel/currentJamDetected", isCurrentJamDetected());
 
         // Motor electrical data
         SmartDashboard.putNumber("flywheel/leaderStator", m_motor.getStatorCurrent().getValueAsDouble());
