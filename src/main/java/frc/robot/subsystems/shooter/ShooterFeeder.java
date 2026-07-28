@@ -172,7 +172,7 @@ public class ShooterFeeder extends SubsystemBase {
     }
 
     public void stopFeederBelts() {
-        m_motorFeeder.set(0);
+        m_motorFeeder.setVoltage(0);
     }
 
     public void stop(){

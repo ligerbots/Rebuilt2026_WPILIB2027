@@ -11,6 +11,11 @@ import static org.wpilib.units.Units.Amps;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Timer;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -23,10 +28,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.units.measure.Current;
-import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
 
 public class Flywheel extends SubsystemBase {
@@ -121,10 +122,10 @@ public class Flywheel extends SubsystemBase {
         SmartDashboard.putNumber("flywheel/goalRPM", m_goalRPM);
 
         // Detection state
-        SmartDashboard.putNumber("flywheel/shotDetectionArmed", m_shotDetectionArmed);
-        SmartDashboard.putNumber("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
+        SmartDashboard.putBoolean("flywheel/shotDetectionArmed", m_shotDetectionArmed);
+        SmartDashboard.putBoolean("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
         SmartDashboard.putNumber("flywheel/jamGrace", m_jamGrace);
-        SmartDashboard.putNumber("flywheel/currentJamDetected", isCurrentJamDetected());
+        SmartDashboard.putBoolean("flywheel/currentJamDetected", isCurrentJamDetected());
 
         // Motor electrical data
         SmartDashboard.putNumber("flywheel/leaderStator", m_motor.getStatorCurrent().getValueAsDouble());
