@@ -11,6 +11,7 @@ import static org.wpilib.units.Units.Amps;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -65,8 +66,8 @@ public class Flywheel extends SubsystemBase {
     public Flywheel() {
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();  
         
-        m_motor = new TalonFX(Constants.FLYWHEEL_CAN_ID);
-        m_follower = new TalonFX(Constants.FLYWHEEL_FOLLOWER_CAN_ID);
+        m_motor = new TalonFX(Constants.FLYWHEEL_CAN_ID, new CANBus());
+        m_follower = new TalonFX(Constants.FLYWHEEL_FOLLOWER_CAN_ID, new CANBus());
         
         Slot0Configs slot0configs = talonFXConfigs.Slot0;
         slot0configs.kP = K_P;
@@ -84,10 +85,10 @@ public class Flywheel extends SubsystemBase {
 
         // enable coast mode (after main config)
         m_motor.getConfigurator().apply(talonFXConfigs);
-        m_motor.setNeutralMode(NeutralModeValue.Coast);
+        m_motor.configNeutralMode(NeutralModeValue.Coast);
 
         m_follower.getConfigurator().apply(talonFXConfigs);
-        m_follower.setNeutralMode(NeutralModeValue.Coast);
+        m_follower.configNeutralMode(NeutralModeValue.Coast);
         m_follower.setControl(new Follower(m_motor.getDeviceID(), MotorAlignmentValue.Opposed));
 
         // DO NOT mess with the update frequency on the motors. This can affect

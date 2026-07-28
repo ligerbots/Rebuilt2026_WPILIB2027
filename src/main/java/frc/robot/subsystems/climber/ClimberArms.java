@@ -10,6 +10,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -80,8 +81,8 @@ public class ClimberArms extends SubsystemBase {
 
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
 
-        m_leftMotor = new TalonFX(Constants.CLIMBER_LEFT_MOTOR_CAN_ID);
-        m_rightMotor = new TalonFX(Constants.CLIMBER_RIGHT_MOTOR_CAN_ID);
+        m_leftMotor = new TalonFX(Constants.CLIMBER_LEFT_MOTOR_CAN_ID, new CANBus());
+        m_rightMotor = new TalonFX(Constants.CLIMBER_RIGHT_MOTOR_CAN_ID, new CANBus());
 
         //TODO find out good K values for each term
         //set slot0 for unloaded state
@@ -115,10 +116,10 @@ public class ClimberArms extends SubsystemBase {
 
         // enable brake mode (after main config)
         m_leftMotor.getConfigurator().apply(talonFXConfigs);
-        m_leftMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_leftMotor.configNeutralMode(NeutralModeValue.Brake);
 
         m_rightMotor.getConfigurator().apply(talonFXConfigs);
-        m_rightMotor.setNeutralMode(NeutralModeValue.Brake);
+        m_rightMotor.configNeutralMode(NeutralModeValue.Brake);
 
         m_leftMotor.setPosition(0);
         m_rightMotor.setPosition(0);

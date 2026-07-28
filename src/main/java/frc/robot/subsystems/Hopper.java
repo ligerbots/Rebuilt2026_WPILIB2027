@@ -15,6 +15,7 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.units.measure.Current;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -51,7 +52,7 @@ public class Hopper extends SubsystemBase {
     // Creates a new Hopper
     public Hopper(Supplier<ChassisVelocities> robotRelativeSpeedsSupplier) {
         m_robotRelativeSpeedsSupplier = robotRelativeSpeedsSupplier;
-        m_motor = new TalonFX(Constants.HOPPER_TRANSFER_CAN_ID);
+        m_motor = new TalonFX(Constants.HOPPER_TRANSFER_CAN_ID, new CANBus());
 
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
         Slot0Configs slot0Config = talonFXConfigs.Slot0;
@@ -71,7 +72,7 @@ public class Hopper extends SubsystemBase {
 
         // enable brake mode (after main config)
         m_motor.getConfigurator().apply(talonFXConfigs);
-        m_motor.setNeutralMode(NeutralModeValue.Brake);
+        m_motor.configNeutralMode(NeutralModeValue.Brake);
 
         if (Constants.OPTIMIZE_CAN) {
             optimizeCAN();
@@ -158,6 +159,6 @@ public class Hopper extends SubsystemBase {
 
         // Intake is on the front of the robot, so the perpendicular component is
         // just robot-relative forward/backward velocity.
-        return robotRelativeSpeeds.vxMetersPerSecond;
+        return robotRelativeSpeeds.vx;
     }
 }
