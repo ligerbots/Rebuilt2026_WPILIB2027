@@ -146,7 +146,7 @@ public class Hopper extends SubsystemBase {
         double compensationRPM = -perpendicularSpeedMetersPerSecond * FEED_COMP_RPM_PER_MPS;
 
         double maxCompensationRPM = FEED_COMP_MAX_RPM;
-        return MathUtil.clamp(compensationRPM, -maxCompensationRPM, maxCompensationRPM);
+        return Math.clamp(compensationRPM, -maxCompensationRPM, maxCompensationRPM);
     }
 
     private double getPerpendicularIntakeSpeedMetersPerSecond() {

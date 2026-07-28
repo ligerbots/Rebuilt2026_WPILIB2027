@@ -96,7 +96,7 @@ public class Hood extends SubsystemBase {
     }
     
     public void setAngle(Rotation2d angle) {
-        m_goalDeg = MathUtil.clamp(angle.getDegrees(), MIN_ANGLE_DEG, MAX_ANGLE_DEG);
+        m_goalDeg = Math.clamp(angle.getDegrees(), MIN_ANGLE_DEG, MAX_ANGLE_DEG);
 
         m_positionControl.Position = m_goalDeg / 360.0 / GEAR_RATIO;
         m_motor.setControl(m_positionControl);
