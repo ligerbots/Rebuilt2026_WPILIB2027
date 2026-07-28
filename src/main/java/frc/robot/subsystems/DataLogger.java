@@ -43,8 +43,8 @@ public class DataLogger extends SubsystemBase {
         SmartDashboard.putBoolean("shoot/hubTimingRelevant", hubTimingRelevant);
 
         // RobotLog
-        SmartDashboard.putNumber("shoot/hubShiftState", officialShiftInfo.currentShift().name());
-        SmartDashboard.putNumber("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
+        SmartDashboard.putString("shoot/hubShiftState", officialShiftInfo.currentShift().name());
+        SmartDashboard.putString("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
         SmartDashboard.putNumber("shoot/projectileLeadTimeSec", HubShiftUtil.getProjectileLeadTimeSec());
     }
 }
