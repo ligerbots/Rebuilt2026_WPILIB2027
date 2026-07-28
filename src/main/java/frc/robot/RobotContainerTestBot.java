@@ -168,7 +168,7 @@ public class RobotContainerTestBot extends RobotContainer {
             m_autoPreviewPoses = autoPreview.poses();
             m_autoPreviewTrajectories = autoPreview.trajectories();
             m_autoPreviewDurationSec = autoPreview.durationSec();
-            m_autoPreviewStartTimeSec = Timer.getFPGATimestamp();
+            m_autoPreviewStartTimeSec = Timer.getMonotonicTimestamp();
             SmartDashboard.putString("Selected Auto", "TestBot Auto");
             m_logger.getField2d().getObject("selectedAutoPath").setPoses(m_autoPreviewPoses);
             updateAutoPreviewActor();
@@ -297,7 +297,7 @@ public class RobotContainerTestBot extends RobotContainer {
             return FieldConstants.flipPose(m_autoPreviewTrajectories.get(m_autoPreviewTrajectories.size() - 1).getEndState().pose);
         }
 
-        double elapsedSec = Timer.getFPGATimestamp() - m_autoPreviewStartTimeSec;
+        double elapsedSec = Timer.getMonotonicTimestamp() - m_autoPreviewStartTimeSec;
         double previewTimeSec = elapsedSec % m_autoPreviewDurationSec;
 
         for (PathPlannerTrajectory trajectory : m_autoPreviewTrajectories) {

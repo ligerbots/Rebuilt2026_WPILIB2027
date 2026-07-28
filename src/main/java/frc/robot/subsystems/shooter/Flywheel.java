@@ -104,7 +104,7 @@ public class Flywheel extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double now = Timer.getFPGATimestamp();
+        double now = Timer.getMonotonicTimestamp();
 
         updateTorqueCurrentAverage(now);
         updateShotDetectionArming(now);
@@ -161,7 +161,7 @@ public class Flywheel extends SubsystemBase {
     
     public void setRPM(double rpm) {
         if (Math.abs(rpm - m_goalRPM) > SPEED_TOLERANCE_RPM) {
-            double now = Timer.getFPGATimestamp();
+            double now = Timer.getMonotonicTimestamp();
             m_lastSpinupCommandTimeSec = now;
             resetTorqueCurrentAverage();
             resetShotDetection(now);
@@ -191,7 +191,7 @@ public class Flywheel extends SubsystemBase {
         setVoltage(0);
         m_goalRPM = 0;
         resetTorqueCurrentAverage();
-        resetShotDetection(Timer.getFPGATimestamp());
+        resetShotDetection(Timer.getMonotonicTimestamp());
     }
 
     private boolean isJamDetectionArmed(double now) {
@@ -233,7 +233,7 @@ public class Flywheel extends SubsystemBase {
         }
 
     public boolean isCurrentJamDetected() {
-        double now = Timer.getFPGATimestamp();
+        double now = Timer.getMonotonicTimestamp();
 
         return (now - m_jamGrace) >= JAM_GRACE && m_shotDetectionArmed;
     }

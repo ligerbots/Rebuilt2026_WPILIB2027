@@ -37,7 +37,7 @@ public class PulseHopper extends Command {
         m_startupReverseActive = true;
         m_isPulsing = false;
         m_pulsingForward = true;
-        m_lastPulsePhaseTimeSec = Timer.getFPGATimestamp();
+        m_lastPulsePhaseTimeSec = Timer.getMonotonicTimestamp();
         m_startupReverseTimer.restart();
     }
 
@@ -56,7 +56,7 @@ public class PulseHopper extends Command {
                 m_startupReverseActive = false;
                 m_isPulsing = false;
                 m_pulsingForward = true;
-                m_lastPulsePhaseTimeSec = Timer.getFPGATimestamp();
+                m_lastPulsePhaseTimeSec = Timer.getMonotonicTimestamp();
             }
         } else if (m_shooter.getFlywheel().isCurrentJamDetected()) {  
             runPulseCycle();
@@ -85,7 +85,7 @@ public class PulseHopper extends Command {
     }
 
     private void runPulseCycle() {
-        double now = Timer.getFPGATimestamp();
+        double now = Timer.getMonotonicTimestamp();
 
         if (!m_isPulsing) {
             m_isPulsing = true;

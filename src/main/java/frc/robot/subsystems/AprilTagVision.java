@@ -203,7 +203,7 @@ public class AprilTagVision {
                     continue;
 
                 // estimatePnpDistanceTrigSolvePose needs a history of the robot heading
-                cam.poseEstimator.addHeadingData(Timer.getTimestamp(), currentPose.getRotation());
+                cam.poseEstimator.addHeadingData(Timer.getMonotonicTimestamp(), currentPose.getRotation());
 
                 for (PhotonPipelineResult pipeRes : cam.photonCamera.getAllUnreadResults()) {
                     camFrames.add(new CameraMeasurement(cam, pipeRes));
