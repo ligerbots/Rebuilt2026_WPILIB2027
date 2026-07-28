@@ -1,7 +1,10 @@
 package frc.robot.utilities;
 
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.driverstation.DriverStation.Alliance;
+import java.util.Optional;
+
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
 import org.wpilib.system.Timer;
 
 public final class HubShiftUtil {
@@ -71,29 +74,29 @@ public final class HubShiftUtil {
     }
 
     public static double getMatchRemainingSec() {
-        if (DriverStation.isAutonomousEnabled()) {
+        if (RobotState.isAutonomousEnabled()) {
             return Math.max(0.0, AUTO_DURATION_SEC - MATCH_TIMER.get());
         }
-        if (DriverStation.isTeleopEnabled()) {
+        if (RobotState.isTeleopEnabled()) {
             return Math.max(0.0, TELEOP_DURATION_SEC - MATCH_TIMER.get());
         }
         return 0.0;
     }
 
     public static Alliance getFirstActiveAlliance() {
-        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+        Alliance alliance = MatchState.getAlliance().orElse(Alliance.BLUE);
 
-        String message = DriverStation.getGameSpecificMessage();
+        Optional<String> message = MatchState.getGameData();
         if (!message.isEmpty()) {
-            char character = message.charAt(0);
+            char character = message.get().charAt(0);
             if (character == 'R') {
-                return Alliance.Blue;
+                return Alliance.BLUE;
             } else if (character == 'B') {
-                return Alliance.Red;
+                return Alliance.RED;
             }
         }
 
-        return alliance == Alliance.Blue ? Alliance.Red : Alliance.Blue;
+        return alliance == Alliance.BLUE ? Alliance.RED : Alliance.BLUE;
     }
 
     public static ShiftInfo getOfficialShiftInfo() {
@@ -125,7 +128,7 @@ public final class HubShiftUtil {
 
     private static boolean[] getSchedule(boolean override) {
         Alliance startAlliance = getFirstActiveAlliance();
-        boolean activeFirst = startAlliance == DriverStation.getAlliance().orElse(Alliance.Blue);
+        boolean activeFirst = startAlliance == MatchState.getAlliance().orElse(Alliance.BLUE);
         if (override) {
             activeFirst = !activeFirst;
         }
@@ -140,11 +143,11 @@ public final class HubShiftUtil {
         boolean active = false;
         ShiftState currentShift = ShiftState.DISABLED;
 
-        if (DriverStation.isAutonomousEnabled()) {
+        if (RobotState.isAutonomousEnabled()) {
             stateTimeRemainingSec = Math.max(0.0, AUTO_DURATION_SEC - currentTimeSec);
             active = true;
             currentShift = ShiftState.AUTO;
-        } else if (DriverStation.isTeleopEnabled()) {
+        } else if (RobotState.isTeleopEnabled()) {
             int currentShiftIndex = shiftStartTimesSec.length - 1;
             for (int i = 0; i < shiftStartTimesSec.length; i++) {
                 if (currentTimeSec >= shiftStartTimesSec[i] && currentTimeSec < shiftEndTimesSec[i]) {
