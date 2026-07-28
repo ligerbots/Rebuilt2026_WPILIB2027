@@ -349,12 +349,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public ChassisVelocities getRobotCentricSpeeds() {
-        return getState().Speeds;
+        return getState().Velocity;
     }
 
     public ChassisVelocities getFieldCentricSpeeds() {
         SwerveDriveState state = getState();
-        return ChassisVelocities.fromRobotRelativeSpeeds(state.Speeds, state.Pose.getRotation());
+        return ChassisVelocities.fromRobotRelativeSpeeds(state.Velocity, state.Pose.getRotation());
     }
 
     /**
@@ -418,7 +418,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     // Method to reset odometry (will be called if your auto has a starting pose)
                     this::resetPose,
                     // ChassisVelocities supplier. MUST BE ROBOT RELATIVE
-                    () -> this.getState().Speeds,
+                    () -> this.getState().Velocity,
                     // Method that will drive the robot given ROBOT RELATIVE ChassisVelocities. Also
                     // optionally outputs individual module feedforwards
                     (speedsRobotRelative, moduleFeedForwards) -> {
