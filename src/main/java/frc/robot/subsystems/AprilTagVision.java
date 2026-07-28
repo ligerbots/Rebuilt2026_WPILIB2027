@@ -26,25 +26,25 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
-import org.wpilib.vision.apriltag.AprilTagFieldLayout;
-import org.wpilib.vision.apriltag.AprilTagFields;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.linalg.VecBuilder;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Rotation3d;
 import org.wpilib.math.geometry.Transform3d;
 import org.wpilib.math.geometry.Translation3d;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.linalg.VecBuilder;
 import org.wpilib.math.numbers.N1;
 import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.framework.RobotBase;
-import org.wpilib.system.Timer;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Timer;
+import org.wpilib.vision.apriltag.AprilTagFieldLayout;
+import org.wpilib.vision.apriltag.AprilTagFields;
 
 import frc.robot.Constants;
 import frc.robot.Robot.RobotType;
@@ -203,7 +203,7 @@ public class AprilTagVision {
                     continue;
 
                 // estimatePnpDistanceTrigSolvePose needs a history of the robot heading
-                cam.poseEstimator.addHeadingData(Timer.getFPGATimestamp(), currentPose.getRotation());
+                cam.poseEstimator.addHeadingData(Timer.getTimestamp(), currentPose.getRotation());
 
                 for (PhotonPipelineResult pipeRes : cam.photonCamera.getAllUnreadResults()) {
                     camFrames.add(new CameraMeasurement(cam, pipeRes));
@@ -285,11 +285,11 @@ public class AprilTagVision {
                     }
                 } catch (Exception e) {
                     // bad! log this and keep going
-                    DriverStation.reportError("Exception running PhotonPoseEstimator", e.getStackTrace());
+                    DriverStationErrors.reportError("Exception running PhotonPoseEstimator", e.getStackTrace());
                 }
             }
         } catch (Exception e) {
-            DriverStation.reportError("Error updating odometry from AprilTags " + e.getLocalizedMessage(), false);
+            DriverStationErrors.reportError("Error updating odometry from AprilTags " + e.getLocalizedMessage(), false);
         }
 
         if (PLOT_VISIBLE_TAGS) {

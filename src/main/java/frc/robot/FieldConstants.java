@@ -1,15 +1,14 @@
 package frc.robot;
 
+import java.util.Optional;
+
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.Units;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.util.FlippingUtil;
-
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.driverstation.DriverStation.Alliance;
 
 public class FieldConstants {
     public static final double FIELD_LENGTH = FlippingUtil.fieldSizeX;
@@ -53,8 +52,8 @@ public class FieldConstants {
         new Translation2d(OPPOSITE_ALLIANCE_ZONE_FAR_TARGET_DISTANCE, FIELD_WIDTH - SIDE_WALL_TARGET_OFFSET_BLUE);
  
     public static boolean isRedAlliance() {
-        Optional<Alliance> alliance = DriverStation.getAlliance();
-        return alliance.isPresent() && alliance.get() == Alliance.Red;
+        Optional<Alliance> alliance = MatchState.getAlliance();
+        return alliance.isPresent() && alliance.get() == Alliance.RED;
     }
 
     // The "flip" routines will transpose a Pose/Translation from Field to Blue, or vice versa.

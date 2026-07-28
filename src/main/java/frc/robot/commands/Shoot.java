@@ -320,7 +320,7 @@ public class Shoot extends Command {
         double distanceFromSideWall = leftSide
                 ? blueLocation.getY()
                 : FieldConstants.FIELD_WIDTH - blueLocation.getY();
-        double ratio = MathUtil.clamp(
+        double ratio = Math.clamp(
                 distanceFromSideWall / FieldConstants.SIDE_WALL_TARGET_LINE_MAX_DISTANCE_BLUE,
                 0.0,
                 1.0);

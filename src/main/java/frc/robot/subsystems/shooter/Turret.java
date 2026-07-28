@@ -256,7 +256,7 @@ public class Turret extends SubsystemBase {
     }
 
     private double limitRotationDeg(double angleDeg) {
-        return MathUtil.clamp(angleDeg, MIN_ROTATION_DEG, MAX_ROTATION_DEG);
+        return Math.clamp(angleDeg, MIN_ROTATION_DEG, MAX_ROTATION_DEG);
     }
     
     /**
