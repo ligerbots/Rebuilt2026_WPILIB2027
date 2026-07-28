@@ -1,15 +1,14 @@
 package frc.robot;
 
+import java.util.Optional;
+
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.Units;
 
-import java.util.Optional;
-
 import com.pathplanner.lib.util.FlippingUtil;
-
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.Alliance;
 
 public class FieldConstants {
     public static final double FIELD_LENGTH = FlippingUtil.fieldSizeX;
