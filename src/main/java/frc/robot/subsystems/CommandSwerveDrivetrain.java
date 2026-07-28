@@ -1,9 +1,31 @@
 package frc.robot.subsystems;
 
-import static org.wpilib.units.Units.*;
+import static org.wpilib.units.Units.Second;
+import static org.wpilib.units.Units.Volts;
 
 import java.util.Optional;
 import java.util.function.Supplier;
+
+import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
+import org.wpilib.command2.Subsystem;
+import org.wpilib.command2.sysid.SysIdRoutine;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.framework.RobotBase;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.linalg.Matrix;
+import org.wpilib.math.numbers.N1;
+import org.wpilib.math.numbers.N3;
+import org.wpilib.math.util.Units;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Notifier;
+import org.wpilib.system.RobotController;
 
 import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.Utils;
@@ -19,29 +41,11 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
-import org.wpilib.math.numbers.N1;
-import org.wpilib.math.numbers.N3;
-import org.wpilib.math.util.Units;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.driverstation.DriverStation.Alliance;
-import org.wpilib.system.Notifier;
-import org.wpilib.framework.RobotBase;
-import org.wpilib.system.RobotController;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
-import org.wpilib.command2.Subsystem;
-import org.wpilib.command2.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.FieldConstants;
+import frc.robot.commands.Shoot;
 import frc.robot.generated.TunerConstantsTestBot.TunerSwerveDrivetrain;
 import frc.robot.subsystems.shooter.Turret;
-import frc.robot.commands.Shoot;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -301,10 +305,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
          * Otherwise, only check and apply the operator perspective if the DS is disabled.
          * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
          */
-        if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-            DriverStation.getAlliance().ifPresent(allianceColor -> {
+        if (!m_hasAppliedOperatorPerspective || RobotState.isDisabled()) {
+            MatchState.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
+                    allianceColor == Alliance.RED
                         ? kRedAlliancePerspectiveRotation
                         : kBlueAlliancePerspectiveRotation
                 );
@@ -344,13 +348,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return getState().Pose;
     }
 
-    public ChassisSpeeds getRobotCentricSpeeds() {
+    public ChassisVelocities getRobotCentricSpeeds() {
         return getState().Speeds;
     }
 
-    public ChassisSpeeds getFieldCentricSpeeds() {
+    public ChassisVelocities getFieldCentricSpeeds() {
         SwerveDriveState state = getState();
-        return ChassisSpeeds.fromRobotRelativeSpeeds(state.Speeds, state.Pose.getRotation());
+        return ChassisVelocities.fromRobotRelativeSpeeds(state.Speeds, state.Pose.getRotation());
     }
 
     /**
@@ -413,12 +417,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     this::getPose,   
                     // Method to reset odometry (will be called if your auto has a starting pose)
                     this::resetPose,
-                    // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                    // ChassisVelocities supplier. MUST BE ROBOT RELATIVE
                     () -> this.getState().Speeds,
-                    // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also
+                    // Method that will drive the robot given ROBOT RELATIVE ChassisVelocities. Also
                     // optionally outputs individual module feedforwards
                     (speedsRobotRelative, moduleFeedForwards) -> {
-                        // Consumer of ChassisSpeeds to drive the robot
+                        // Consumer of ChassisVelocities to drive the robot
                         this.setControl(autoRequest.withSpeeds(speedsRobotRelative));
                     },
                     // PPHolonomicController is the built in path following controller for holonomic
@@ -468,7 +472,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
             return path;
         } catch (Exception e) {
-            DriverStation.reportError(String.format("Unable to load PP path %s", pathName), true);
+            DriverStationErrors.reportError(String.format("Unable to load PP path %s", pathName), true);
         }
         return null;
     }

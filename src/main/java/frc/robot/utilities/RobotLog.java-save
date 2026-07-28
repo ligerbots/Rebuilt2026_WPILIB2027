@@ -48,7 +48,7 @@ public final class RobotLog {
     }
 
     private static boolean shouldLog(String key, double minPeriodSec) {
-        double now = Timer.getFPGATimestamp();
+        double now = Timer.getMonotonicTimestamp();
         Double lastLogSec = LAST_LOG_TIMESTAMPS_SEC.get(key);
         if (lastLogSec != null && now - lastLogSec < minPeriodSec) {
             return false;

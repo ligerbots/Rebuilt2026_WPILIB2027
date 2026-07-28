@@ -109,13 +109,13 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        // double startT = Timer.getFPGATimestamp();
+        // double startT = Timer.getMonotonicTimestamp();
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
         if (m_autonomousCommand != null) {
             CommandScheduler.getInstance().schedule(m_autonomousCommand);
         }
-        // System.out.println("*** AutoInit took " + (Timer.getFPGATimestamp() - startT) + " seconds");
+        // System.out.println("*** AutoInit took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
     }
 
     @Override

@@ -25,7 +25,6 @@ import org.wpilib.command2.SubsystemBase;
 import org.wpilib.command2.WaitCommand;
 import org.wpilib.command2.WaitUntilCommand;
 import frc.robot.Constants;
-import frc.robot.utilities.RobotLog;
 
 public class IntakePivot extends SubsystemBase {
     private static final Current SUPPLY_CURRENT_LIMIT = Amps.of(20);
@@ -118,14 +117,14 @@ public class IntakePivot extends SubsystemBase {
         SmartDashboard.putBoolean("intake/onTarget", onTarget());
 
         // Commanded state
-        RobotLog.log("intake/deployGoal", m_goal.getDegrees());
+        SmartDashboard.putNumber("intake/deployGoal", m_goal.getDegrees());
 
         // Motor electrical data
-        RobotLog.log("intake/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
-        RobotLog.log("intake/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("intake/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("intake/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
 
         // Raw sensor/debug
-        // RobotLog.log("intake/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("intake/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
     }
 
     public void setPositionToDeployed() {

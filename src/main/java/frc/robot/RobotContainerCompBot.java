@@ -26,8 +26,9 @@ import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
+import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.system.Timer;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
@@ -446,11 +447,11 @@ public class RobotContainerCompBot extends RobotContainer {
         int currentAutoSelectionCode = Objects.hash(
             selectedAutoName,
             selectedFieldSide,
-            DriverStation.getAlliance());
+            MatchState.getAlliance());
 
         // Only call constructor if the auto selection inputs have changed
         if (m_autoSelectionCode != currentAutoSelectionCode) {
-            // double startT = Timer.getFPGATimestamp();
+            // double startT = Timer.getMonotonicTimestamp();
 
             m_autoSelectionCode = currentAutoSelectionCode;
 
@@ -460,13 +461,13 @@ public class RobotContainerCompBot extends RobotContainer {
             m_autoPreviewPoses = autoPreview.poses();
             m_autoPreviewTrajectories = autoPreview.trajectories();
             m_autoPreviewDurationSec = autoPreview.durationSec();
-            m_autoPreviewStartTimeSec = Timer.getFPGATimestamp();
+            m_autoPreviewStartTimeSec = Timer.getMonotonicTimestamp();
             SmartDashboard.putString("Selected Auto", selectedAutoName);
             m_logger.getField2d().getObject("selectedAutoPath").setPoses(m_autoPreviewPoses);
 
             updateAutoPreviewActor();
 
-            // System.out.println("*** Build Auto command took " + (Timer.getFPGATimestamp() - startT) + " seconds");
+            // System.out.println("*** Build Auto command took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
         }
         
         return m_autoCommand;
@@ -584,7 +585,7 @@ public class RobotContainerCompBot extends RobotContainer {
         double startingSpeedMps = path.getIdealStartingState() != null ? path.getIdealStartingState().velocityMPS() : 0.0;
         Rotation2d pathHeading = getPathHeading(path);
         Translation2d fieldVelocity = new Translation2d(startingSpeedMps, pathHeading);
-        ChassisSpeeds startingSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        ChassisVelocities startingSpeeds = ChassisVelocities.fromFieldRelativeSpeeds(
             fieldVelocity.getX(),
             fieldVelocity.getY(),
             0.0,
@@ -628,7 +629,7 @@ public class RobotContainerCompBot extends RobotContainer {
             return FieldConstants.flipPose(m_autoPreviewTrajectories.get(m_autoPreviewTrajectories.size() - 1).getEndState().pose);
         }
 
-        double elapsedSec = Timer.getFPGATimestamp() - m_autoPreviewStartTimeSec;
+        double elapsedSec = Timer.getMonotonicTimestamp() - m_autoPreviewStartTimeSec;
         double previewTimeSec = elapsedSec % m_autoPreviewDurationSec;
 
         for (PathPlannerTrajectory trajectory : m_autoPreviewTrajectories) {

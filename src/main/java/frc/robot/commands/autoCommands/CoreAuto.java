@@ -2,15 +2,17 @@ package frc.robot.commands.autoCommands;
 
 import java.util.List;
 
-import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.InstantCommand;
 import org.wpilib.command2.WaitCommand;
 import org.wpilib.command2.button.InternalButton;
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.smartdashboard.SmartDashboard;
+
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -53,12 +55,12 @@ public class CoreAuto extends AutoCommandInterface {
                     }
                     addCommands(m_driveTrain.followPath(path));
                 } else {
-                    DriverStation.reportError("Invalid auto step: " + step.toString(), true);
+                    DriverStationErrors.reportError("Invalid auto step: " + step.toString(), true);
                 }
             }
             // Clmber code goes here, but we don't have a climber yet so we'll leave it out for now
         } catch (Exception e) {
-            DriverStation.reportError("Unable to load PP path Test", true);
+            DriverStationErrors.reportError("Unable to load PP path Test", true);
             m_initPose = new Pose2d();
         }
     }
@@ -87,7 +89,7 @@ public class CoreAuto extends AutoCommandInterface {
             }
             return startPath.getStartingHolonomicPose().get();
         } catch (Exception e) {
-            DriverStation.reportError("Unable to load PP path for initial pose", true);
+            DriverStationErrors.reportError("Unable to load PP path for initial pose", true);
             return new Pose2d();
         }
     }

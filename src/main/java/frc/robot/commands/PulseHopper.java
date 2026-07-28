@@ -1,12 +1,12 @@
 package frc.robot.commands;
 
-import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.Command;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Timer;
+
 import frc.robot.subsystems.Hopper;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Turret;
-import frc.robot.utilities.RobotLog;
 
 public class PulseHopper extends Command {
     private static final double STARTUP_REVERSE_SPEED_RPM = -4500.0;
@@ -37,7 +37,7 @@ public class PulseHopper extends Command {
         m_startupReverseActive = true;
         m_isPulsing = false;
         m_pulsingForward = true;
-        m_lastPulsePhaseTimeSec = Timer.getFPGATimestamp();
+        m_lastPulsePhaseTimeSec = Timer.getMonotonicTimestamp();
         m_startupReverseTimer.restart();
     }
 
@@ -56,7 +56,7 @@ public class PulseHopper extends Command {
                 m_startupReverseActive = false;
                 m_isPulsing = false;
                 m_pulsingForward = true;
-                m_lastPulsePhaseTimeSec = Timer.getFPGATimestamp();
+                m_lastPulsePhaseTimeSec = Timer.getMonotonicTimestamp();
             }
         } else if (m_shooter.getFlywheel().isCurrentJamDetected()) {  
             runPulseCycle();
@@ -66,8 +66,8 @@ public class PulseHopper extends Command {
         }
 
         SmartDashboard.putBoolean("hopper/pulseActive", m_isPulsing);
-        RobotLog.log("hopper/shooterLatched", m_shooterOnTarget);
-        RobotLog.log("hopper/startupReverseActive", m_startupReverseActive);
+        SmartDashboard.putBoolean("hopper/shooterLatched", m_shooterOnTarget);
+        SmartDashboard.putBoolean("hopper/startupReverseActive", m_startupReverseActive);
     }
 
     @Override
@@ -75,8 +75,8 @@ public class PulseHopper extends Command {
         m_hopper.stop();
         m_startupReverseTimer.stop();
         SmartDashboard.putBoolean("hopper/pulseActive", false);
-        RobotLog.log("hopper/shooterLatched", false);
-        RobotLog.log("hopper/startupReverseActive", false);
+        SmartDashboard.putBoolean("hopper/shooterLatched", false);
+        SmartDashboard.putBoolean("hopper/startupReverseActive", false);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class PulseHopper extends Command {
     }
 
     private void runPulseCycle() {
-        double now = Timer.getFPGATimestamp();
+        double now = Timer.getMonotonicTimestamp();
 
         if (!m_isPulsing) {
             m_isPulsing = true;

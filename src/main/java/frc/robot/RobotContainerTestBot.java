@@ -12,25 +12,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandXboxController;
+import org.wpilib.command2.button.RobotModeTriggers;
+import org.wpilib.command2.sysid.SysIdRoutine.Direction;
+import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.math.geometry.Translation2d;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.smartdashboard.SendableChooser;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.system.Timer;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.geometry.Translation2d;
-import org.wpilib.math.kinematics.ChassisSpeeds;
-import org.wpilib.driverstation.DriverStation;
-import org.wpilib.system.Timer;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandXboxController;
-import org.wpilib.command2.button.RobotModeTriggers;
-import org.wpilib.command2.sysid.SysIdRoutine.Direction;
 
 import frc.robot.commands.autoCommands.AutoCommandInterface;
 import frc.robot.commands.autoCommands.CoreAuto;
@@ -151,7 +152,7 @@ public class RobotContainerTestBot extends RobotContainer {
     public Command getAutonomousCommand() {
         String selectedFieldSide = m_chosenFieldSide.getSelected();
         int currentAutoSelectionCode = Objects.hash(selectedFieldSide,
-            DriverStation.getAlliance());
+            MatchState.getAlliance());
         List<Object> pathFiles = List.of(
             "Start Bump to Fuel Begin",
             "Fuel Begin to Fuel End With Events",
@@ -167,7 +168,7 @@ public class RobotContainerTestBot extends RobotContainer {
             m_autoPreviewPoses = autoPreview.poses();
             m_autoPreviewTrajectories = autoPreview.trajectories();
             m_autoPreviewDurationSec = autoPreview.durationSec();
-            m_autoPreviewStartTimeSec = Timer.getFPGATimestamp();
+            m_autoPreviewStartTimeSec = Timer.getMonotonicTimestamp();
             SmartDashboard.putString("Selected Auto", "TestBot Auto");
             m_logger.getField2d().getObject("selectedAutoPath").setPoses(m_autoPreviewPoses);
             updateAutoPreviewActor();
@@ -252,7 +253,7 @@ public class RobotContainerTestBot extends RobotContainer {
         double startingSpeedMps = path.getIdealStartingState() != null ? path.getIdealStartingState().velocityMPS() : 0.0;
         Rotation2d pathHeading = getPathHeading(path);
         Translation2d fieldVelocity = new Translation2d(startingSpeedMps, pathHeading);
-        ChassisSpeeds startingSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+        ChassisVelocities startingSpeeds = ChassisVelocities.fromFieldRelativeSpeeds(
             fieldVelocity.getX(),
             fieldVelocity.getY(),
             0.0,
@@ -296,7 +297,7 @@ public class RobotContainerTestBot extends RobotContainer {
             return FieldConstants.flipPose(m_autoPreviewTrajectories.get(m_autoPreviewTrajectories.size() - 1).getEndState().pose);
         }
 
-        double elapsedSec = Timer.getFPGATimestamp() - m_autoPreviewStartTimeSec;
+        double elapsedSec = Timer.getMonotonicTimestamp() - m_autoPreviewStartTimeSec;
         double previewTimeSec = elapsedSec % m_autoPreviewDurationSec;
 
         for (PathPlannerTrajectory trajectory : m_autoPreviewTrajectories) {

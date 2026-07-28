@@ -6,10 +6,16 @@
 
 package frc.robot.subsystems;
 
+import static org.wpilib.units.Units.Amps;
+
 import java.util.function.Supplier;
 
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.kinematics.ChassisVelocities;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.units.measure.Current;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -17,16 +23,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import static org.wpilib.units.Units.Amps;
-
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.math.kinematics.ChassisSpeeds;
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
-import frc.robot.utilities.RobotLog;
 
 public class Hopper extends SubsystemBase {
     
@@ -46,13 +43,13 @@ public class Hopper extends SubsystemBase {
     private static final double FEED_COMP_MAX_RPM = 1000.0;
     
     private final TalonFX m_motor;
-    private final Supplier<ChassisSpeeds> m_robotRelativeSpeedsSupplier;
+    private final Supplier<ChassisVelocities> m_robotRelativeSpeedsSupplier;
 
     private final VelocityVoltage m_velocityControl = new VelocityVoltage(0).withEnableFOC(true);
     private double m_goalRPM;
 
     // Creates a new Hopper
-    public Hopper(Supplier<ChassisSpeeds> robotRelativeSpeedsSupplier) {
+    public Hopper(Supplier<ChassisVelocities> robotRelativeSpeedsSupplier) {
         m_robotRelativeSpeedsSupplier = robotRelativeSpeedsSupplier;
         m_motor = new TalonFX(Constants.HOPPER_TRANSFER_CAN_ID);
 
@@ -94,16 +91,16 @@ public class Hopper extends SubsystemBase {
         SmartDashboard.putNumber("hopper/RPM", getRPM());
 
         // Commanded state
-        RobotLog.log("hopper/goalRPM", m_goalRPM);
+        SmartDashboard.putNumber("hopper/goalRPM", m_goalRPM);
 
         // Motor electrical data
-        RobotLog.log("hopper/voltage", m_motor.getMotorVoltage().getValueAsDouble());
-        RobotLog.log("hopper/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
-        RobotLog.log("hopper/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("hopper/voltage", m_motor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("hopper/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("hopper/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
 
         // Feed compensation
-        RobotLog.log("hopper/feedCompPerpendicularSpeedMps", getPerpendicularIntakeSpeedMetersPerSecond());
-        RobotLog.log("hopper/feedCompRPM", getFeedRPMCompensation());
+        SmartDashboard.putNumber("hopper/feedCompPerpendicularSpeedMps", getPerpendicularIntakeSpeedMetersPerSecond());
+        SmartDashboard.putNumber("hopper/feedCompRPM", getFeedRPMCompensation());
     }
     
     public void intake(){
@@ -154,7 +151,7 @@ public class Hopper extends SubsystemBase {
             return 0.0;
         }
 
-        ChassisSpeeds robotRelativeSpeeds = m_robotRelativeSpeedsSupplier.get();
+        ChassisVelocities robotRelativeSpeeds = m_robotRelativeSpeedsSupplier.get();
         if (robotRelativeSpeeds == null) {
             return 0.0;
         }
