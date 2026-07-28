@@ -1,11 +1,12 @@
 
 package frc.robot.commands.autoCommands;
 
+import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.math.geometry.Pose2d;
+
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.driverstation.DriverStation;
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
@@ -46,7 +47,7 @@ public class FirstBasicAuto extends AutoCommandInterface {
                 addCommands(m_driveTrain.followPath(path));
             }
         } catch (Exception e) {
-            DriverStation.reportError("Unable to load PP path Test", true);
+            DriverStationErrors.reportError("Unable to load PP path Test", true);
             m_initPose = new Pose2d();
         }
     }

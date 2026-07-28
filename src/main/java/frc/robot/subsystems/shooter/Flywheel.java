@@ -27,7 +27,6 @@ import org.wpilib.system.Timer;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utilities.RobotLog;
 
 public class Flywheel extends SubsystemBase {
     private static final double SPEED_TOLERANCE_RPM = 175.0;
@@ -118,25 +117,25 @@ public class Flywheel extends SubsystemBase {
 
 
         // Speed and setpoint
-        RobotLog.log("flywheel/goalRPM", m_goalRPM);
+        SmartDashboard.putNumber("flywheel/goalRPM", m_goalRPM);
 
         // Detection state
-        RobotLog.log("flywheel/shotDetectionArmed", m_shotDetectionArmed);
-        RobotLog.log("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
-        RobotLog.log("flywheel/jamGrace", m_jamGrace);
-        RobotLog.log("flywheel/currentJamDetected", isCurrentJamDetected());
+        SmartDashboard.putNumber("flywheel/shotDetectionArmed", m_shotDetectionArmed);
+        SmartDashboard.putNumber("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
+        SmartDashboard.putNumber("flywheel/jamGrace", m_jamGrace);
+        SmartDashboard.putNumber("flywheel/currentJamDetected", isCurrentJamDetected());
 
         // Motor electrical data
-        RobotLog.log("flywheel/leaderStator", m_motor.getStatorCurrent().getValueAsDouble());
-        RobotLog.log("flywheel/followerStator", m_follower.getStatorCurrent().getValueAsDouble());
-        RobotLog.log("flywheel/leaderSupply", m_motor.getSupplyCurrent().getValueAsDouble());
-        RobotLog.log("flywheel/followerSupply", m_follower.getSupplyCurrent().getValueAsDouble());
-        RobotLog.log("flywheel/leaderTorqueCurrent", m_motor.getTorqueCurrent().getValueAsDouble());
-        RobotLog.log("flywheel/followerTorqueCurrent", m_follower.getTorqueCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("flywheel/leaderStator", m_motor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("flywheel/followerStator", m_follower.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("flywheel/leaderSupply", m_motor.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("flywheel/followerSupply", m_follower.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("flywheel/leaderTorqueCurrent", m_motor.getTorqueCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("flywheel/followerTorqueCurrent", m_follower.getTorqueCurrent().getValueAsDouble());
 
         // Derived current metrics
-        RobotLog.log("flywheel/totalTorqueCurrent", getTotalTorqueCurrent());
-        RobotLog.log("flywheel/avgTorqueCurrent", getAverageTorqueCurrent());
+        SmartDashboard.putNumber("flywheel/totalTorqueCurrent", getTotalTorqueCurrent());
+        SmartDashboard.putNumber("flywheel/avgTorqueCurrent", getAverageTorqueCurrent());
     }
     
     public void setVoltage(double voltage) {

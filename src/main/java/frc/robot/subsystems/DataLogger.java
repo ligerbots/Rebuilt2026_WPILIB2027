@@ -10,7 +10,6 @@ import org.wpilib.system.RobotController;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.utilities.HubShiftUtil;
-import frc.robot.utilities.RobotLog;
 
 public class DataLogger extends SubsystemBase {
     // private final PowerDistribution m_powerDist = new PowerDistribution();
@@ -21,11 +20,11 @@ public class DataLogger extends SubsystemBase {
     @Override
     public void periodic() {
         // Power
-        // RobotLog.log("power/totalCurrent", m_powerDist.getTotalCurrent());
-        RobotLog.log("power/batteryVoltage", RobotController.getBatteryVoltage());
+        // SmartDashboard.putNumber("power/totalCurrent", m_powerDist.getTotalCurrent());
+        SmartDashboard.putNumber("power/batteryVoltage", RobotController.getBatteryVoltage());
 
         // Network
-        RobotLog.log("network/CAN Bus Utilization",
+        SmartDashboard.putNumber("network/CAN Bus Utilization",
                 RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus().percentBusUtilization);
 
         HubShiftUtil.ShiftInfo officialShiftInfo = HubShiftUtil.getOfficialShiftInfo();
@@ -44,8 +43,8 @@ public class DataLogger extends SubsystemBase {
         SmartDashboard.putBoolean("shoot/hubTimingRelevant", hubTimingRelevant);
 
         // RobotLog
-        RobotLog.log("shoot/hubShiftState", officialShiftInfo.currentShift().name());
-        RobotLog.log("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
-        RobotLog.log("shoot/projectileLeadTimeSec", HubShiftUtil.getProjectileLeadTimeSec());
+        SmartDashboard.putNumber("shoot/hubShiftState", officialShiftInfo.currentShift().name());
+        SmartDashboard.putNumber("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
+        SmartDashboard.putNumber("shoot/projectileLeadTimeSec", HubShiftUtil.getProjectileLeadTimeSec());
     }
 }

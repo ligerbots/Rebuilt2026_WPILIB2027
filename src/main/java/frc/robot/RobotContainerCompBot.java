@@ -28,6 +28,7 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisSpeeds;
 import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
 import org.wpilib.system.Timer;
 import org.wpilib.smartdashboard.SendableChooser;
 import org.wpilib.smartdashboard.SmartDashboard;
@@ -446,7 +447,7 @@ public class RobotContainerCompBot extends RobotContainer {
         int currentAutoSelectionCode = Objects.hash(
             selectedAutoName,
             selectedFieldSide,
-            DriverStation.getAlliance());
+            MatchState.getAlliance());
 
         // Only call constructor if the auto selection inputs have changed
         if (m_autoSelectionCode != currentAutoSelectionCode) {

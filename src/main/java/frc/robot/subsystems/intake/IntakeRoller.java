@@ -21,7 +21,6 @@ import org.wpilib.units.measure.Current;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utilities.RobotLog;
 
 public class IntakeRoller extends SubsystemBase {
     private static final Current SUPPLY_CURRENT_LIMIT = Amps.of(40);
@@ -93,12 +92,12 @@ public class IntakeRoller extends SubsystemBase {
         
         // Commanded state
         SmartDashboard.putNumber("intake/goalRPM", m_goalRPM);
-        RobotLog.log("intake/voltageFudge", m_intakeRPMScale);
+        SmartDashboard.putNumber("intake/voltageFudge", m_intakeRPMScale);
 
         // Motor electrical data
-        RobotLog.log("intake/voltage", m_motor.getMotorVoltage().getValueAsDouble());
-        RobotLog.log("intake/rollerSupply", m_motor.getSupplyCurrent().getValueAsDouble());
-        RobotLog.log("intake/rollerStator", m_motor.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("intake/voltage", m_motor.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("intake/rollerSupply", m_motor.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("intake/rollerStator", m_motor.getStatorCurrent().getValueAsDouble());
     }
          
     public double getRPM(){

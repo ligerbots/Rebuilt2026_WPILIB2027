@@ -10,7 +10,6 @@ import org.wpilib.units.measure.Current;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utilities.RobotLog;
 
 import static org.wpilib.units.Units.Amps;
 
@@ -89,10 +88,10 @@ public class Hood extends SubsystemBase {
         SmartDashboard.putNumber("hood/currentAngle", getAngle().getDegrees());
 
         // Commanded state
-        RobotLog.log("hood/goalAngle", m_goalDeg);
+        SmartDashboard.putNumber("hood/goalAngle", m_goalDeg);
 
         // Raw sensor/debug
-        // RobotLog.log("hood/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
+        // SmartDashboard.putNumber("hood/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
     }
     
     public void setAngle(Rotation2d angle) {

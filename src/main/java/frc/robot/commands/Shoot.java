@@ -20,7 +20,6 @@ import frc.robot.subsystems.shooter.ShooterFeeder;
 import frc.robot.subsystems.shooter.Turret;
 import frc.robot.subsystems.shooter.Shooter.ShotType;
 import frc.robot.utilities.HubShiftUtil;
-import frc.robot.utilities.RobotLog;
 import frc.robot.utilities.ShooterLookupTable.ShootValue;
 
 /**
@@ -157,7 +156,7 @@ public class Shoot extends Command {
         m_shooter.setShootValues(shotValue);
         m_feeder.setKickerRPM(shotValue.feedRPM);
         
-        RobotLog.log("shoot/shotAngle", angle.getDegrees());
+        SmartDashboard.putNumber("shoot/shotAngle", angle.getDegrees());
 
         if (!m_shooterOnTarget && m_shooter.onTarget()) {
             m_shooterOnTarget = true;
@@ -355,8 +354,8 @@ public class Shoot extends Command {
         ChassisSpeeds speedInformation = m_speedsSupplier.get();
         Translation2d robotVelVector = new Translation2d(speedInformation.vxMetersPerSecond, speedInformation.vyMetersPerSecond);
 
-        RobotLog.log("shoot/robotVel", robotVelVector.getNorm());
-        RobotLog.log("shoot/robotOmega", speedInformation.omegaRadiansPerSecond);
+        SmartDashboard.putNumber("shoot/robotVel", robotVelVector.getNorm());
+        SmartDashboard.putNumber("shoot/robotOmega", speedInformation.omegaRadiansPerSecond);
 
         Pose2d futureRobotPose = new Pose2d(
             currentPose.getTranslation().plus(robotVelVector.times(LATENCY_SECONDS_TRANSLATION)),
@@ -418,8 +417,8 @@ public class Shoot extends Command {
 
         HubShiftUtil.setShotContext(timeOfFlight, effectiveShotType == ShotType.HUB);
 
-        RobotLog.log("shoot/tof", timeOfFlight);
-        RobotLog.log("shoot/targetDistance", targetDistance);
+        SmartDashboard.putNumber("shoot/tof", timeOfFlight);
+        SmartDashboard.putNumber("shoot/targetDistance", targetDistance);
 
         return targetVector;
     }

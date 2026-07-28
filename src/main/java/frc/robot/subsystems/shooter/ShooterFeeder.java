@@ -18,7 +18,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.utilities.RobotLog;
 
 public class ShooterFeeder extends SubsystemBase {
     
@@ -120,15 +119,15 @@ public class ShooterFeeder extends SubsystemBase {
         SmartDashboard.putNumber("feeder/currentRPM", getFeederRPM()); 
         
         // Kicker state
-        RobotLog.log("kicker/goalRPM", m_kickerGoalRPM);
-        RobotLog.log("kicker/statorCurrent", m_motorKicker.getStatorCurrent().getValueAsDouble());
-        RobotLog.log("kicker/supplyCurrent", m_motorKicker.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("kicker/goalRPM", m_kickerGoalRPM);
+        SmartDashboard.putNumber("kicker/statorCurrent", m_motorKicker.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("kicker/supplyCurrent", m_motorKicker.getSupplyCurrent().getValueAsDouble());
 
         // Feeder state
-        RobotLog.log("feeder/goalRPM", m_feederGoalRPM);
-        RobotLog.log("feeder/statorCurrent", m_motorFeeder.getStatorCurrent().getValueAsDouble());
-        RobotLog.log("feeder/supplyCurrent", m_motorFeeder.getSupplyCurrent().getValueAsDouble());
-        RobotLog.log("feeder/voltage", m_motorFeeder.getMotorVoltage().getValueAsDouble());
+        SmartDashboard.putNumber("feeder/goalRPM", m_feederGoalRPM);
+        SmartDashboard.putNumber("feeder/statorCurrent", m_motorFeeder.getStatorCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("feeder/supplyCurrent", m_motorFeeder.getSupplyCurrent().getValueAsDouble());
+        SmartDashboard.putNumber("feeder/voltage", m_motorFeeder.getMotorVoltage().getValueAsDouble());
     }
     
     public double getKickerRPM(){
