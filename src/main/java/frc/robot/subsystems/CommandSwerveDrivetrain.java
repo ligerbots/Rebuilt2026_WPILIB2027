@@ -68,7 +68,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final PIDConstants PATH_PLANNER_TRANSLATION_PID = new PIDConstants(5, 0, 0);
     private static final PIDConstants PATH_PLANNER_ANGLE_PID       = new PIDConstants(5, 0, 0);
 
-    private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds();
+    private final SwerveRequest.ApplyRobotVelocity autoRequest = new SwerveRequest.ApplyRobotVelocity();
 
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -357,52 +357,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return ChassisVelocities.fromRobotRelativeSpeeds(state.Velocity, state.Pose.getRotation());
     }
 
-    /**
-     * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
-     * while still accounting for measurement noise.
-     *
-     * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-     * @param timestampSeconds The timestamp of the vision measurement in seconds.
-     */
-    @Override
-    public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
-    }
-
-    /**
-     * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
-     * while still accounting for measurement noise.
-     * <p>
-     * Note that the vision measurement standard deviations passed into this method
-     * will continue to apply to future measurements until a subsequent call to
-     * {@link #setVisionMeasurementStdDevs(Matrix)} or this method.
-     *
-     * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-     * @param timestampSeconds The timestamp of the vision measurement in seconds.
-     * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement
-     *     in the form [x, y, theta]ᵀ, with units in meters and radians.
-     */
-    @Override
-    public void addVisionMeasurement(
-        Pose2d visionRobotPoseMeters,
-        double timestampSeconds,
-        Matrix<N3, N1> visionMeasurementStdDevs
-    ) {
-        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
-    }
-
-    /**
-     * Return the pose at a given timestamp, if the buffer is not empty.
-     *
-     * @param timestampSeconds The timestamp of the pose in seconds.
-     * @return The pose at the given timestamp (or Optional.empty() if the buffer is
-     *         empty).
-     */
-    @Override
-    public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
-        return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
-    }
-
     public void setupPathPlanner() {
         try {
             // Load the RobotConfig from the settings file created by GUI. 
@@ -423,8 +377,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     // optionally outputs individual module feedforwards
                     (speedsRobotRelative, moduleFeedForwards) -> {
                         // Consumer of ChassisVelocities to drive the robot
-                        this.setControl(autoRequest.withSpeeds(speedsRobotRelative));
+                        this.setControl(autoRequest.withVelocity(speedsRobotRelative));
                     },
+                    // Version from CTRE example
+                    // (velocity, feedforwards) -> setControl(
+                    //     autoRequest.withVelocity(velocity.discretize(0.020))
+                    //         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                    //         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                    // ),
+                    // 
                     // PPHolonomicController is the built in path following controller for holonomic
                     // drive trains
                     new PPHolonomicDriveController(
@@ -439,8 +400,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             );
 
         } catch (Exception e) {
-            // Handle exception as needed
-            e.printStackTrace();
+            DriverStationErrors.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
         }
 
         // Preload PathPlanner Path finding
@@ -448,7 +408,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         
         CommandScheduler.getInstance().schedule(PathfindingCommand.warmupCommand());
         CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
-
     }
 
     /**
