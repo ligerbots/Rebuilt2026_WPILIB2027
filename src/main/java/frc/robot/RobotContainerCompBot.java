@@ -587,11 +587,7 @@ public class RobotContainerCompBot extends RobotContainer {
         double startingSpeedMps = path.getIdealStartingState() != null ? path.getIdealStartingState().velocityMPS() : 0.0;
         Rotation2d pathHeading = getPathHeading(path);
         Translation2d fieldVelocity = new Translation2d(startingSpeedMps, pathHeading);
-        ChassisVelocities startingSpeeds = ChassisVelocities.fromFieldRelativeSpeeds(
-            fieldVelocity.getX(),
-            fieldVelocity.getY(),
-            0.0,
-            startingRotation);
+        ChassisVelocities startingSpeeds = new ChassisVelocities(fieldVelocity.getX(), fieldVelocity.getY(), 0.0).toRobotRelative(startingRotation);
 
         return path.generateTrajectory(startingSpeeds, startingRotation, robotConfig);
     }

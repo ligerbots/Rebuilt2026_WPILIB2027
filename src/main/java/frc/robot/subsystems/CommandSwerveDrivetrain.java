@@ -354,7 +354,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public ChassisVelocities getFieldCentricSpeeds() {
         SwerveDriveState state = getState();
-        return ChassisVelocities.fromRobotRelativeSpeeds(state.Velocity, state.Pose.getRotation());
+        return state.Velocity.toFieldRelative(state.Pose.getRotation());
     }
 
     public void setupPathPlanner() {
