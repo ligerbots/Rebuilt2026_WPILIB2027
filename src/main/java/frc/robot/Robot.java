@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
             if (driveTrain != null) driveTrain.setPose(m_robotContainer.getInitialPose());
         }
 
-        m_robotContainer.updateAutoPreviewActor();
+        m_robotContainer.updateAutoPreview();
     }
 
     @Override

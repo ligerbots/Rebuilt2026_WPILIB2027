@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import static org.wpilib.units.Units.Second;
 import static org.wpilib.units.Units.Volts;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.wpilib.command2.Command;
@@ -19,9 +18,6 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.math.linalg.Matrix;
-import org.wpilib.math.numbers.N1;
-import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.Units;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Notifier;
@@ -67,6 +63,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // values from 2024 competition. Maybe should be tuned
     private static final PIDConstants PATH_PLANNER_TRANSLATION_PID = new PIDConstants(5, 0, 0);
     private static final PIDConstants PATH_PLANNER_ANGLE_PID       = new PIDConstants(5, 0, 0);
+
+    // The auto visualizer needs the RobotConfig from PathPlanner, so keep around
+    private RobotConfig m_robotConfig = null;
 
     private final SwerveRequest.ApplyRobotVelocity autoRequest = new SwerveRequest.ApplyRobotVelocity();
 
@@ -234,6 +233,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //     m_aprilTagVision = aprilTagVision;
     // }
 
+    @SuppressWarnings("unused")
     private void optimizeCAN() {
         // According to CTRE Support, the variables needed for odometry have
         // already been set with the appropriate update frequency,
@@ -357,11 +357,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return state.Velocity.toFieldRelative(state.Pose.getRotation());
     }
 
+    public RobotConfig getPPRobotConfig() {
+        return m_robotConfig;
+    }
+
     public void setupPathPlanner() {
         try {
             // Load the RobotConfig from the settings file created by GUI. 
             // You should probably store this in your Constants file
-            RobotConfig config = RobotConfig.fromGUISettings();
+            m_robotConfig = RobotConfig.fromGUISettings();
 
             // TODO: fix code to allow FF
             // final boolean enableFeedforward = true;
@@ -392,7 +396,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             PATH_PLANNER_TRANSLATION_PID,
                             PATH_PLANNER_ANGLE_PID),
                     // The robot configuration
-                    config,
+                    m_robotConfig,
                     // whether to flip directions for Red
                     () -> FieldConstants.isRedAlliance(),
                     // Reference to this subsystem to set requirements

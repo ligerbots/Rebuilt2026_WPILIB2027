@@ -15,6 +15,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import frc.robot.FieldConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.utilities.AutoVisualizer;
 
 public class CoreAuto extends AutoCommandInterface {
 
@@ -26,8 +27,8 @@ public class CoreAuto extends AutoCommandInterface {
             Math.toRadians(540), Math.toRadians(720));
 
     public static CoreAuto getInstance(List<Object> pathSteps, CommandSwerveDrivetrain driveTrain, boolean isOutpostSide,
-            InternalButton virtualShootButton) {
-        return new CoreAuto(pathSteps, driveTrain, isOutpostSide, virtualShootButton);
+            InternalButton virtualShootButton, AutoVisualizer visualizer) {
+        return new CoreAuto(pathSteps, driveTrain, isOutpostSide, virtualShootButton, visualizer);
     }
     
     /** Creates a new CoreAuto. 
@@ -35,7 +36,7 @@ public class CoreAuto extends AutoCommandInterface {
      * @param m_turret 
      */
     private CoreAuto(List<Object> pathSteps, CommandSwerveDrivetrain driveTrain, boolean isOutpostSide,
-            InternalButton virtualShootButton) {
+            InternalButton virtualShootButton, AutoVisualizer visualizer) {
 
         m_driveTrain = driveTrain;
 
@@ -54,6 +55,7 @@ public class CoreAuto extends AutoCommandInterface {
                         path = path.mirrorPath();
                     }
                     addCommands(m_driveTrain.followPath(path));
+                    visualizer.addPath(path);
                 } else {
                     DriverStationErrors.reportError("Invalid auto step: " + step.toString(), true);
                 }
