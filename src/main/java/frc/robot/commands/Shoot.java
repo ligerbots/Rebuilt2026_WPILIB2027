@@ -10,7 +10,6 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.util.Units;
-import org.wpilib.math.util.MathUtil;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.Command;
 
