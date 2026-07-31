@@ -41,13 +41,12 @@ public class AutoVisualizer {
     }
 
     public void update() {
-        Pose2d previewPose = getAnimatedPreviewPose();
-        if (previewPose == null) {
+        Pose2d previewPoseBlue = getAnimatedPreviewPoseBlue();
+        if (previewPoseBlue == null) {
             m_field.getObject(PREVIEW_ROBOT_NAME).setPoses();
-            return;
+        } else {
+            m_field.getObject(PREVIEW_ROBOT_NAME).setPose(FieldConstants.flipPose(previewPoseBlue));
         }
-
-        m_field.getObject(PREVIEW_ROBOT_NAME).setPose(previewPose);
     }
 
     public void clear() {
@@ -103,7 +102,7 @@ public class AutoVisualizer {
         return headingVector.getAngle();
     }
 
-    private Pose2d getAnimatedPreviewPose() {
+    private Pose2d getAnimatedPreviewPoseBlue() {
         if (m_previewTrajectories.isEmpty()) {
             if (m_previewPoses.isEmpty()) {
                 return null;
@@ -112,22 +111,21 @@ public class AutoVisualizer {
             return m_previewPoses.get(0);
         }
 
-        if (m_previewDurationSec <= 0.0) {
-            return FieldConstants.flipPose(m_previewTrajectories.get(m_previewTrajectories.size() - 1).getEndState().pose);
-        }
+        if (m_previewDurationSec > 0.0) {
+            double elapsedSec = m_previewTimer.get();
+            double previewTimeSec = elapsedSec % m_previewDurationSec;
 
-        double elapsedSec = m_previewTimer.get();
-        double previewTimeSec = elapsedSec % m_previewDurationSec;
+            for (PathPlannerTrajectory trajectory : m_previewTrajectories) {
+                double trajectoryDurationSec = trajectory.getTotalTimeSeconds();
+                if (previewTimeSec <= trajectoryDurationSec) {
+                    return trajectory.sample(previewTimeSec).pose;
+                }
 
-        for (PathPlannerTrajectory trajectory : m_previewTrajectories) {
-            double trajectoryDurationSec = trajectory.getTotalTimeSeconds();
-            if (previewTimeSec <= trajectoryDurationSec) {
-                return FieldConstants.flipPose(trajectory.sample(previewTimeSec).pose);
+                previewTimeSec -= trajectoryDurationSec;
             }
-
-            previewTimeSec -= trajectoryDurationSec;
         }
 
-        return FieldConstants.flipPose(m_previewTrajectories.get(m_previewTrajectories.size() - 1).getEndState().pose);
+        // return the end pose
+        return m_previewTrajectories.get(m_previewTrajectories.size() - 1).getEndState().pose;
     }
 }
