@@ -13,6 +13,7 @@ public abstract class RobotContainer {
     public abstract Pose2d getInitialPose();
 
     public abstract CommandSwerveDrivetrain getDriveTrain();
+
     public abstract void clearAutoPreview();
-    public abstract void updateAutoPreviewActor();
+    public abstract void updateAutoPreview();
 }
