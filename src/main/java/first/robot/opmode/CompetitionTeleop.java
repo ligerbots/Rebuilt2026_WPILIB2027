@@ -11,7 +11,6 @@ import org.wpilib.command2.StartEndCommand;
 import org.wpilib.command2.button.CommandGenericHID;
 import org.wpilib.command2.button.CommandNiDsXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
-import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.opmode.PeriodicOpMode;
@@ -27,16 +26,17 @@ import first.robot.subsystems.shooter.Shooter.ShotType;
 
 @Teleop
 public class CompetitionTeleop extends PeriodicOpMode {
-    private static final double JOYSTICK_DEADBAND = 0.05;
+    protected static final double JOYSTICK_DEADBAND = 0.05;
 
     // Setting up bindings for necessary control of the swerve drive platform
-    private final SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric()
+    protected final SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric()
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
 
     // set the swerve wheels in an X pattern
     private final SwerveRequest.SwerveDriveBrake m_brakeRequest = new SwerveRequest.SwerveDriveBrake();
 
-    private final Robot m_robot;
+    // This is "protected" so that the subclasses can access it
+    protected final Robot m_robot;
 
     /** The Robot instance is passed into the opmode via the constructor. */
     public CompetitionTeleop(Robot robot) {
