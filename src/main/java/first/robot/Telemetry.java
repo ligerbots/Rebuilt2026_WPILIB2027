@@ -61,15 +61,16 @@ public class Telemetry {
             .append(new MechanismLigament2d("Direction", 0.1, 0, 0, new Color8Bit(Color.WHITE))),
     };
 
-    private Field2d m_field = new Field2d();
+    private final Field2d m_field;
 
     /**
      * Construct a telemetry object, with the specified max speed of the robot
      * 
      * @param maxSpeed Maximum speed in meters per second
      */
-    public Telemetry(double maxSpeed) {
+    public Telemetry(double maxSpeed, Field2d field2d) {
         MaxSpeed = maxSpeed;
+        m_field = field2d;
         SignalLogger.start();
 
         /* Set up the module state Mechanism2d telemetry */
@@ -78,10 +79,6 @@ public class Telemetry {
         }
 
         SmartDashboard.putData("Field", m_field);
-    }
-
-    public Field2d getField2d() {
-        return m_field;
     }
 
     /** Accept the swerve drive state and telemeterize it to SmartDashboard and SignalLogger. */

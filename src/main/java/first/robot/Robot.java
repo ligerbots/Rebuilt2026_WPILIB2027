@@ -14,11 +14,15 @@ import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.OpModeRobot;
 import org.wpilib.hardware.hal.HALUtil;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.DataLogManager;
 
 import com.ctre.phoenix6.HootAutoReplay;
 
+import first.robot.commands.PulseHopper;
+import first.robot.commands.Shoot;
 import first.robot.generated.TunerConstantsCompBot;
 import first.robot.generated.TunerConstantsTestBot;
 import first.robot.subsystems.AprilTagVision;
@@ -36,7 +40,9 @@ public class Robot extends OpModeRobot {
     public static final double MAX_SPEED = SPEED_LIMIT * TunerConstantsCompBot.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    public final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED);
+    private final Field2d m_field2d = new Field2d();
+
+    public final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED, m_field2d);
 
     public final CommandNiDsXboxController driverController = new CommandNiDsXboxController(0);
     public final CommandJoystick farm = new CommandJoystick(1);
@@ -45,10 +51,11 @@ public class Robot extends OpModeRobot {
     public final AprilTagVision aprilTagVision;
     public final ShooterFeeder shooterFeeder = new ShooterFeeder();
     public final Shooter shooter = new Shooter();
-    public final Turret turret = new Turret(m_swerveLogger.getField2d());
+    public final Turret turret = new Turret(m_field2d);
     public final Intake intake = new Intake();
     public final Hopper hopper;
 
+    
     // not used directly, but the periodic() method logs data
     @SuppressWarnings("unused")
     private final DataLogger m_dataLogger = new DataLogger();
@@ -83,7 +90,7 @@ public class Robot extends OpModeRobot {
         // Create the subsystems (aka Mechanisms)
         // If there are differences between robots, create the correct version here
 
-        aprilTagVision = new AprilTagVision(m_robotType, m_swerveLogger.getField2d());
+        aprilTagVision = new AprilTagVision(m_robotType, m_field2d);
 
         if (m_robotType == RobotType.TESTBOT) {
             drivetrain = new CommandSwerveDrivetrain(
@@ -122,8 +129,12 @@ public class Robot extends OpModeRobot {
     }
 
     // Useful if a subsystem needs to know which chassis
-    public static RobotType getRobotType() {
+    public RobotType getRobotType() {
         return m_robotType;
+    }
+
+    public Field2d getField2d() {
+        return m_field2d;
     }
 
     // @Override
@@ -148,6 +159,20 @@ public class Robot extends OpModeRobot {
     @Override
     public void disabledInit() {
         HubShiftUtil.disable();
+    }
+
+    // Uses most of the Subsystems, and needed in Teleop and Auto
+    public Command shootCommand(Shooter.ShotType shotType) {
+        return new Shoot(shooter, turret, shooterFeeder, drivetrain::getPose, drivetrain::getFieldCentricVelocity, shotType)
+                .alongWith(new PulseHopper(hopper, shooter, turret));
+
+        // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
+    }
+    public Command shootCommand(double shotDistanceInches, Rotation2d turretHeading) {
+        return new Shoot(shooter, turret, shooterFeeder, drivetrain::getPose, drivetrain::getFieldCentricVelocity, shotDistanceInches, turretHeading)
+                .alongWith(new PulseHopper(hopper, shooter, turret));
+
+        // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
     }
 
     // @Override

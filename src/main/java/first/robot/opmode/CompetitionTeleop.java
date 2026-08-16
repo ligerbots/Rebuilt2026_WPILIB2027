@@ -20,8 +20,6 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import first.robot.Robot;
-import first.robot.commands.PulseHopper;
-import first.robot.commands.Shoot;
 import first.robot.subsystems.shooter.Shooter.ShotType;
 
 @Teleop
@@ -46,40 +44,40 @@ public class CompetitionTeleop extends PeriodicOpMode {
         CommandNiDsXboxController driverController = m_robot.driverController;
         CommandGenericHID farmController = m_robot.farm;
 
-        robot.drivetrain.setDefaultCommand(driveCommand());
+        m_robot.drivetrain.setDefaultCommand(driveCommand());
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
-                robot.drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+                m_robot.drivetrain.applyRequest(() -> idle).ignoringDisable(true));
 
         // enable/disable brake mode on the pivot when the robot is disabled
-        RobotModeTriggers.disabled().onFalse(new InstantCommand(() -> robot.intake.getPivot().setBrakeMode(false)));
+        RobotModeTriggers.disabled().onFalse(new InstantCommand(() -> m_robot.intake.getPivot().setBrakeMode(false)));
         RobotModeTriggers.disabled().onTrue(
-                new InstantCommand(() -> robot.intake.getPivot().setBrakeMode(true)).ignoringDisable(true));
+                new InstantCommand(() -> m_robot.intake.getPivot().setBrakeMode(true)).ignoringDisable(true));
 
         // Just shoot
-        driverController.rightTrigger().whileTrue(shootCommand());
+        driverController.rightTrigger().whileTrue(m_robot.shootCommand(ShotType.AUTO));
 
         // shoot while intaking
-        driverController.rightBumper().whileTrue(shootCommand());
-        driverController.rightBumper().onTrue(robot.intake.getPivot().deployCommand());
+        driverController.rightBumper().whileTrue(m_robot.shootCommand(ShotType.AUTO));
+        driverController.rightBumper().onTrue(m_robot.intake.getPivot().deployCommand());
         driverController.rightBumper().whileTrue(
-                new StartEndCommand(robot.intake.getRoller()::intake, robot.intake.getRoller()::stop, robot.intake.getRoller()));
+                new StartEndCommand(m_robot.intake.getRoller()::intake, m_robot.intake.getRoller()::stop, m_robot.intake.getRoller()));
 
         // Deploy and run the intake (intake will stay out)
-        driverController.leftTrigger().onTrue(robot.intake.getPivot().deployCommand());
+        driverController.leftTrigger().onTrue(m_robot.intake.getPivot().deployCommand());
         driverController.leftTrigger().whileTrue(
-                new StartEndCommand(robot.intake.getRoller()::fastIntake, robot.intake.getRoller()::stop,
-                        robot.intake.getRoller()));
-        // .alongWith(new StartEndCommand(m_robot.hopper::intake, m_robot.hopper::stop, m_robot.hopper)));
+                new StartEndCommand(m_robot.intake.getRoller()::fastIntake, m_robot.intake.getRoller()::stop,
+                        m_robot.intake.getRoller()));
+        // .alongWith(new StartEndCommand(m_robot.hopper::intake, m_robot.hopper::stop, m_m_robot.hopper)));
 
         // Stow the intake
-        driverController.leftBumper().onTrue(robot.intake.stowCommand());
+        driverController.leftBumper().onTrue(m_robot.intake.stowCommand());
 
         // lock wheels
-        driverController.back().whileTrue(robot.drivetrain.applyRequest(() -> m_brakeRequest));
+        driverController.back().whileTrue(m_robot.drivetrain.applyRequest(() -> m_brakeRequest));
 
         // Unjam
         farmController.button(21).whileTrue(unjamCommand());
@@ -91,41 +89,36 @@ public class CompetitionTeleop extends PeriodicOpMode {
         // fixed shots - distance in inches, plus ROBOT angle of turret
         // ladder - robot against the outside of the ladder, intake to the left for the
         // dirver
-        farmController.button(11).whileTrue(withHopperControl(
-                new Shoot(robot.shooter, robot.turret, robot.shooterFeeder,
-                        robot.drivetrain::getPose, robot.drivetrain::getFieldCentricVelocity, 130.0, Rotation2d.kCCW_90deg)));
+        farmController.button(11).whileTrue(m_robot.shootCommand(130.0, Rotation2d.kCCW_90deg));
 
         // corner shot
-        farmController.button(13).whileTrue(withHopperControl(
-                new Shoot(robot.shooter, robot.turret, robot.shooterFeeder,
-                        robot.drivetrain::getPose, robot.drivetrain::getFieldCentricVelocity, 210.0, Rotation2d.k180deg)));
-        farmController.button(15).whileTrue(withHopperControl(
-                new Shoot(robot.shooter, robot.turret, robot.shooterFeeder,
-                        robot.drivetrain::getPose, robot.drivetrain::getFieldCentricVelocity, ShotType.TEST)));
+        farmController.button(13).whileTrue(m_robot.shootCommand(210.0, Rotation2d.k180deg));
+        // TODO: move all test code to a new OpMode
+        farmController.button(15).whileTrue(m_robot.shootCommand(ShotType.TEST));
 
-        farmController.button(1).onTrue(new InstantCommand(robot.shooter::increaseFlyFudge));
-        farmController.button(2).onTrue(new InstantCommand(robot.shooter::decreaseFlyFudge));
+        farmController.button(1).onTrue(new InstantCommand(m_robot.shooter::increaseFlyFudge));
+        farmController.button(2).onTrue(new InstantCommand(m_robot.shooter::decreaseFlyFudge));
 
         // set the intake sensor position assuming it is deployed
-        farmController.button(24).onTrue(new InstantCommand(() -> robot.intake.getPivot().setPositionToDeployed()));
+        farmController.button(24).onTrue(new InstantCommand(() -> m_robot.intake.getPivot().setPositionToDeployed()));
 
-        farmController.button(6).onTrue(new InstantCommand(robot.shooter::increaseFeedFudge));
-        farmController.button(7).onTrue(new InstantCommand(robot.shooter::decreaseFeedFudge));
+        farmController.button(6).onTrue(new InstantCommand(m_robot.shooter::increaseFeedFudge));
+        farmController.button(7).onTrue(new InstantCommand(m_robot.shooter::decreaseFeedFudge));
 
-        farmController.button(9).onTrue(new InstantCommand(robot.shooter::increaseHoodFudge));
-        farmController.button(10).onTrue(new InstantCommand(robot.shooter::decreaseHoodFudge));
+        farmController.button(9).onTrue(new InstantCommand(m_robot.shooter::increaseHoodFudge));
+        farmController.button(10).onTrue(new InstantCommand(m_robot.shooter::decreaseHoodFudge));
 
-        farmController.button(4).onTrue(new InstantCommand(robot.turret::increaseTurretFudge));
-        farmController.button(5).onTrue(new InstantCommand(robot.turret::decreaseTurretFudge));
+        farmController.button(4).onTrue(new InstantCommand(m_robot.turret::increaseTurretFudge));
+        farmController.button(5).onTrue(new InstantCommand(m_robot.turret::decreaseTurretFudge));
 
-        farmController.button(12).onTrue(new InstantCommand(robot.intake.getRoller()::increaseIntakeFudge));
-        farmController.button(14).onTrue(new InstantCommand(robot.intake.getRoller()::decreaseIntakeFudge));
+        farmController.button(12).onTrue(new InstantCommand(m_robot.intake.getRoller()::increaseIntakeFudge));
+        farmController.button(14).onTrue(new InstantCommand(m_robot.intake.getRoller()::decreaseIntakeFudge));
 
-        farmController.button(3).onTrue(new InstantCommand(() -> robot.shooter.setPassNeutral(true)));
-        farmController.button(8).onTrue(new InstantCommand(() -> robot.shooter.setPassNeutral(false)));
+        farmController.button(3).onTrue(new InstantCommand(() -> m_robot.shooter.setPassNeutral(true)));
+        farmController.button(8).onTrue(new InstantCommand(() -> m_robot.shooter.setPassNeutral(false)));
 
         // Reset the field-centric heading on Start press.
-        driverController.start().onTrue(robot.drivetrain.runOnce(robot.drivetrain::seedFieldCentric));
+        driverController.start().onTrue(m_robot.drivetrain.runOnce(m_robot.drivetrain::seedFieldCentric));
     }
 
     @Override
@@ -175,11 +168,6 @@ public class CompetitionTeleop extends PeriodicOpMode {
         return Math.abs(value) * value;
     }
 
-    public Command shootCommand() {
-        return withHopperControl(
-                new Shoot(m_robot.shooter, m_robot.turret, m_robot.shooterFeeder, m_robot.drivetrain::getPose, m_robot.drivetrain::getFieldCentricVelocity, ShotType.AUTO));
-                        //     new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
-    }
 
     private Command unjamCommand() {
         return new ParallelCommandGroup(
@@ -192,9 +180,5 @@ public class CompetitionTeleop extends PeriodicOpMode {
         return new ParallelCommandGroup(
                 new StartEndCommand(m_robot.hopper::reverse, m_robot.hopper::stop, m_robot.hopper),
                 m_robot.intake.outtakeCommand());
-    }
-
-    private Command withHopperControl(Command shootCommand) {
-        return shootCommand.alongWith(new PulseHopper(m_robot.hopper, m_robot.shooter, m_robot.turret));
     }
 }
