@@ -21,7 +21,6 @@ import org.wpilib.smartdashboard.SmartDashboard;
 
 import com.pathplanner.lib.events.EventTrigger;
 
-import first.robot.FieldConstants;
 import first.robot.Robot;
 import first.robot.commands.autoCommands.AutoCommandInterface;
 import first.robot.commands.autoCommands.CoreAuto;
@@ -29,10 +28,9 @@ import first.robot.subsystems.CommandSwerveDrivetrain;
 import first.robot.subsystems.shooter.Shooter.ShotType;
 import first.robot.utilities.AutoVisualizer;
 
-@Autonomous(name = "My Auto")
+@Autonomous()
 public class CompetitionAuto extends PeriodicOpMode {        
-    private AutoCommandInterface m_autoCommand;
-    private boolean m_prevIsRedAlliance = true;
+    private AutoCommandInterface m_autoCommand = null;
     private AutoVisualizer m_autoVisualizer = null;
 
     private final InternalButton m_virtualShootButton = new InternalButton();
@@ -53,22 +51,10 @@ public class CompetitionAuto extends PeriodicOpMode {
     
     @Override
     public void disabledPeriodic() {
-        boolean isRedAlliance = FieldConstants.isRedAlliance();
-        AutoCommandInterface newAuto = getAutonomousCommand();
+        // check if the Auto command has been changed
+        updateAutoCommand();
 
-        // don't change the initialPose unless the Auto or Alliance has changed
-        // don't want to override the true pose on the field (as determined by the AprilTags)
-        //
-        // Note: use "==" to compare autos - checks if they are the same object
-        if (isRedAlliance != m_prevIsRedAlliance || newAuto != m_autoCommand) {
-            m_autoCommand = newAuto;
-            m_prevIsRedAlliance = isRedAlliance;
-
-            // drivetrain might be null when testing code. So check
-            CommandSwerveDrivetrain driveTrain = m_robot.drivetrain;
-            if (driveTrain != null) driveTrain.setPose(m_autoCommand.getInitialPose());
-        }
-
+        // Move the robot in the auto preview
         updateAutoPreview();
     }
 
@@ -92,8 +78,17 @@ public class CompetitionAuto extends PeriodicOpMode {
         // not sure this is actually needed?
         if (m_autoCommand != null) {
             CommandScheduler.getInstance().cancel(m_autoCommand);
-        }        
+        }      
+        
+        if (m_autoVisualizer != null) 
+            m_autoVisualizer.registerAndStart(m_robot.getField2d());
     }
+
+    @Override
+    public void close() {
+        if (m_autoVisualizer != null)
+            m_autoVisualizer.clear();
+    } 
 
     private void configureAutos() {
 
@@ -244,7 +239,7 @@ public class CompetitionAuto extends PeriodicOpMode {
 
      }
 
-    public AutoCommandInterface getAutonomousCommand() {
+    private void updateAutoCommand() {
         String selectedAutoName = m_chosenAutoPaths.getSelected();
         String selectedFieldSide = m_chosenFieldSide.getSelected();
         int currentAutoSelectionCode = Objects.hash(
@@ -253,27 +248,30 @@ public class CompetitionAuto extends PeriodicOpMode {
             MatchState.getAlliance());
 
         // Only call constructor if the auto selection inputs have changed
-        if (m_autoSelectionCode != currentAutoSelectionCode) {
-            // double startT = Timer.getMonotonicTimestamp();
+        if (m_autoSelectionCode == currentAutoSelectionCode) return;
 
-            m_autoSelectionCode = currentAutoSelectionCode;
+        // double startT = Timer.getMonotonicTimestamp();
 
-            List<Object> selectedAutoPaths = m_autoPathOptions.get(selectedAutoName);
-            boolean isOutpostSide = selectedFieldSide.equals("Outpost Side");
+        m_autoSelectionCode = currentAutoSelectionCode;
 
-            m_autoVisualizer = new AutoVisualizer(m_robot.drivetrain.getPPRobotConfig());
-            m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, m_robot.drivetrain, isOutpostSide, m_virtualShootButton, m_autoVisualizer);
+        List<Object> selectedAutoPaths = m_autoPathOptions.get(selectedAutoName);
+        boolean isOutpostSide = selectedFieldSide.equals("Outpost Side");
 
-            SmartDashboard.putString("Selected Auto", selectedAutoName);
-            m_autoVisualizer.registerAndStart(m_robot.getField2d());
-            // System.out.println("*** Build Auto command took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
-        }
-        
-        return m_autoCommand;
+        m_autoVisualizer = new AutoVisualizer(m_robot.drivetrain.getPPRobotConfig());
+        m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, m_robot.drivetrain, isOutpostSide, m_virtualShootButton, m_autoVisualizer);
+
+        SmartDashboard.putString("Selected Auto", selectedAutoName);
+        m_autoVisualizer.registerAndStart(m_robot.getField2d());
+        // System.out.println("*** Build Auto command took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
+        // drivetrain might be null when testing code. So check
+        CommandSwerveDrivetrain driveTrain = m_robot.drivetrain;
+        if (driveTrain != null) driveTrain.setPose(m_autoCommand.getInitialPose());
     }
 
     public Pose2d getInitialPose() {
-        return ((AutoCommandInterface) getAutonomousCommand()).getInitialPose();
+        if (m_autoCommand != null)
+            return m_autoCommand.getInitialPose();
+        return Pose2d.kZero;
     }    
 
     public void updateAutoPreview() {
