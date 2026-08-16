@@ -40,17 +40,30 @@ public class CompetitionTeleop extends PeriodicOpMode {
     public CompetitionTeleop(Robot robot) {
         m_robot = robot;
 
-        // for convenience here, since they are used so frequently below
-        CommandNiDsXboxController driverController = m_robot.driverController;
-        CommandGenericHID farmController = m_robot.farm;
+        driveBindings();
+        mainBindings();
+    }
 
-        m_robot.drivetrain.setDefaultCommand(driveCommand());
+    // The binding configuration is broken into a couple of routines so that
+    // different pieces
+    void driveBindings() {
+        m_robot.drivetrain.setDefaultCommand(
+                m_robot.drivetrain.applyRequest(() -> m_driveRequest
+                        .withVelocityX(-conditionAxis(m_robot.driverController.getLeftY()) * Robot.MAX_SPEED)
+                        .withVelocityY(-conditionAxis(m_robot.driverController.getLeftX()) * Robot.MAX_SPEED)
+                        .withRotationalRate(-conditionAxis(m_robot.driverController.getRightX()) * Robot.MAX_ANGULAR_RATE)));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
                 m_robot.drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+    }
+
+    void mainBindings() {
+        // for convenience here, since they are used so frequently below
+        CommandNiDsXboxController driverController = m_robot.driverController;
+        CommandGenericHID farmController = m_robot.farm;
 
         // enable/disable brake mode on the pivot when the robot is disabled
         RobotModeTriggers.disabled().onFalse(new InstantCommand(() -> m_robot.intake.getPivot().setBrakeMode(false)));
@@ -121,53 +134,38 @@ public class CompetitionTeleop extends PeriodicOpMode {
         driverController.start().onTrue(m_robot.drivetrain.runOnce(m_robot.drivetrain::seedFieldCentric));
     }
 
-    @Override
-    public void disabledPeriodic() {
-        /* Called periodically (on every DS packet) while the robot is disabled. */
-    }
+    // @Override
+    // public void disabledPeriodic() {
+    //     /* Called periodically (on every DS packet) while the robot is disabled. */
+    // }
 
-    @Override
-    public void start() {
-        /* Called once when the robot is enabled. */
-    }
+    // @Override
+    // public void start() {
+    //     /* Called once when the robot is enabled. */
+    // }
 
-    @Override
-    public void periodic() {
-        /* Called periodically (set time interval) while the robot is enabled. */
-    }
+    // @Override
+    // public void periodic() {
+    //     /* Called periodically (set time interval) while the robot is enabled. */
+    // }
 
-    @Override
-    public void end() {
-        /* Called when the robot is disabled (after previously being enabled). */
-    }
+    // @Override
+    // public void end() {
+    //     /* Called when the robot is disabled (after previously being enabled). */
+    // }
 
-    @Override
-    public void close() {
-        /*
-         * Called when the opmode is de-selected / no additional methods will be called.
-         */
-    }
-
-    public Command driveCommand() {
-        // The controls are for field-oriented driving:
-        // Left stick Y axis -> forward and backwards movement
-        // Left stick X axis -> left and right movement
-        // Right stick X axis -> rotation
-
-        // NOTE: for competition with our best driver, no slew limiters
-        return m_robot.drivetrain.applyRequest(() ->
-                m_driveRequest.withVelocityX(-conditionAxis(m_robot.driverController.getLeftY()) * Robot.MAX_SPEED)
-                    .withVelocityY(-conditionAxis(m_robot.driverController.getLeftX()) * Robot.MAX_SPEED)
-                    .withRotationalRate(-conditionAxis(m_robot.driverController.getRightX()) * Robot.MAX_ANGULAR_RATE)
-                );
-    }
+    // @Override
+    // public void close() {
+    //     /*
+    //      * Called when the opmode is de-selected / no additional methods will be called.
+    //      */
+    // }
 
     private double conditionAxis(double value) {
         value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
         // Square the axis, retaining the sign
         return Math.abs(value) * value;
     }
-
 
     private Command unjamCommand() {
         return new ParallelCommandGroup(

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.wpilib.command2.Command;
+import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.InstantCommand;
 import org.wpilib.command2.button.InternalButton;
 import org.wpilib.driverstation.MatchState;
@@ -21,15 +21,18 @@ import org.wpilib.smartdashboard.SmartDashboard;
 
 import com.pathplanner.lib.events.EventTrigger;
 
+import first.robot.FieldConstants;
 import first.robot.Robot;
 import first.robot.commands.autoCommands.AutoCommandInterface;
 import first.robot.commands.autoCommands.CoreAuto;
+import first.robot.subsystems.CommandSwerveDrivetrain;
 import first.robot.subsystems.shooter.Shooter.ShotType;
 import first.robot.utilities.AutoVisualizer;
 
-@Autonomous(name = "My Auto", group = "Group 1")
-public class CompetitionAuto extends PeriodicOpMode {
+@Autonomous(name = "My Auto")
+public class CompetitionAuto extends PeriodicOpMode {        
     private AutoCommandInterface m_autoCommand;
+    private boolean m_prevIsRedAlliance = true;
     private AutoVisualizer m_autoVisualizer = null;
 
     private final InternalButton m_virtualShootButton = new InternalButton();
@@ -40,7 +43,7 @@ public class CompetitionAuto extends PeriodicOpMode {
     private int m_autoSelectionCode = Integer.MIN_VALUE; 
 
     private final Robot m_robot;
-    
+
     /** The Robot instance is passed into the opmode via the constructor. */
     public CompetitionAuto(Robot robot) {
         m_robot = robot;
@@ -48,15 +51,48 @@ public class CompetitionAuto extends PeriodicOpMode {
         configureAutos();
     }
     
-    /*
-    * This method runs periodically, using the same period as the Robot instance.
-    *
-    * Additional periodic methods may be configured with addPeriodic(),
-    * which can have periods that differ from the main Robot instance.
-    */
     @Override
-    public void periodic() {
-        // Put custom auto code here
+    public void disabledPeriodic() {
+        boolean isRedAlliance = FieldConstants.isRedAlliance();
+        AutoCommandInterface newAuto = getAutonomousCommand();
+
+        // don't change the initialPose unless the Auto or Alliance has changed
+        // don't want to override the true pose on the field (as determined by the AprilTags)
+        //
+        // Note: use "==" to compare autos - checks if they are the same object
+        if (isRedAlliance != m_prevIsRedAlliance || newAuto != m_autoCommand) {
+            m_autoCommand = newAuto;
+            m_prevIsRedAlliance = isRedAlliance;
+
+            // drivetrain might be null when testing code. So check
+            CommandSwerveDrivetrain driveTrain = m_robot.drivetrain;
+            if (driveTrain != null) driveTrain.setPose(m_autoCommand.getInitialPose());
+        }
+
+        updateAutoPreview();
+    }
+
+    @Override
+    public void start() {
+        // clear the Auto preview 
+        clearAutoPreview();
+
+        // schedule the Auto command
+        if (m_autoCommand != null)
+            CommandScheduler.getInstance().schedule(m_autoCommand);
+    }
+
+    /**
+     * This function is called asynchronously when the robot disables or switches
+     * opmodes while this
+     * opmode is enabled. Implementations should stop blocking work promptly.
+     */
+    @Override
+    public  void end() {
+        // not sure this is actually needed?
+        if (m_autoCommand != null) {
+            CommandScheduler.getInstance().cancel(m_autoCommand);
+        }        
     }
 
     private void configureAutos() {
@@ -208,7 +244,7 @@ public class CompetitionAuto extends PeriodicOpMode {
 
      }
 
-    public Command getAutonomousCommand() {
+    public AutoCommandInterface getAutonomousCommand() {
         String selectedAutoName = m_chosenAutoPaths.getSelected();
         String selectedFieldSide = m_chosenFieldSide.getSelected();
         int currentAutoSelectionCode = Objects.hash(

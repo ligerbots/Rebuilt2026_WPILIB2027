@@ -175,31 +175,6 @@ public class Robot extends OpModeRobot {
         // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
     }
 
-    // @Override
-    // public void disabledPeriodic() {
-    //     boolean isRedAlliance = FieldConstants.isRedAlliance();
-    //     Command newAuto = m_robotContainer.getAutonomousCommand();
-
-    //     // don't change the initialPose unless the Auto or Alliance has changed
-    //     // don't want to override the true pose on the field (as determined by the AprilTags)
-    //     //
-    //     // Note: use "==" to compare autos - checks if they are the same object
-    //     if (isRedAlliance != m_prevIsRedAlliance || newAuto != m_autonomousCommand) {
-    //         m_autonomousCommand = newAuto;
-    //         m_prevIsRedAlliance = isRedAlliance;
-
-    //         // drivetrain might be null when testing code. So check
-    //         CommandSwerveDrivetrain driveTrain = m_robotContainer.getDriveTrain();
-    //         if (driveTrain != null) driveTrain.setPose(m_robotContainer.getInitialPose());
-    //     }
-
-    //     m_robotContainer.updateAutoPreview();
-    // }
-
-    // @Override
-    // public void disabledExit() {
-    //     m_robotContainer.clearAutoPreview();
-    // }
 
     // @Override
     // public void autonomousInit() {

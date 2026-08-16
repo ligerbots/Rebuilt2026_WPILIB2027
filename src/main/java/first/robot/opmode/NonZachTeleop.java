@@ -1,9 +1,11 @@
 package first.robot.opmode;
 
-import org.wpilib.command2.Command;
+import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.opmode.Teleop;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import first.robot.Robot;
 
@@ -26,17 +28,19 @@ public class NonZachTeleop extends CompetitionTeleop {
     // Different drive command for our less experienced drivers
     // Include slewRateLimiters to smooth the control
     @Override
-    public Command driveCommand() {
-        // The controls are for field-oriented driving:
-        // Left stick Y axis -> forward and backwards movement
-        // Left stick X axis -> left and right movement
-        // Right stick X axis -> rotation
-
-        return m_robot.drivetrain.applyRequest(() ->
+    void driveBindings() {
+        m_robot.drivetrain.setDefaultCommand(
+                m_robot.drivetrain.applyRequest(() ->
                 m_driveRequest.withVelocityX(-conditionAxis(m_robot.driverController.getLeftY(), m_xLimiter) * Robot.MAX_SPEED)
                     .withVelocityY(-conditionAxis(m_robot.driverController.getLeftX(), m_yLimiter) * Robot.MAX_SPEED)
                     .withRotationalRate(-conditionAxis(m_robot.driverController.getRightX(), m_rotationLimiter) * Robot.MAX_ANGULAR_RATE)
-                );
+                ));
+
+        // Idle while the robot is disabled. This ensures the configured
+        // neutral mode is applied to the drive motors while disabled.
+        final var idle = new SwerveRequest.Idle();
+        RobotModeTriggers.disabled().whileTrue(
+                m_robot.drivetrain.applyRequest(() -> idle).ignoringDisable(true));
     }
 
     private double conditionAxis(double value, SlewRateLimiter limiter) {
