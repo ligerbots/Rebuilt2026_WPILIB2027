@@ -1,0 +1,182 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package first.robot;
+
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.RotationsPerSecond;
+
+import java.util.List;
+import java.util.Objects;
+
+import org.wpilib.command2.Command;
+import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.RobotModeTriggers;
+import org.wpilib.command2.sysid.SysIdRoutine.Direction;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.internal.DriverStationBackend;
+import org.wpilib.math.geometry.Pose2d;
+import org.wpilib.math.util.MathUtil;
+import org.wpilib.smartdashboard.SendableChooser;
+import org.wpilib.smartdashboard.SmartDashboard;
+
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import first.robot.commands.autoCommands.AutoCommandInterface;
+import first.robot.commands.autoCommands.CoreAuto;
+import first.robot.generated.TunerConstantsTestBot;
+import first.robot.subsystems.AprilTagVision;
+import first.robot.subsystems.CommandSwerveDrivetrain;
+import first.robot.utilities.AutoVisualizer;
+
+public class RobotContainerTestBot extends RobotContainer {
+    private static double SPEED_LIMIT = 0.5;
+    private double MAX_SPEED = SPEED_LIMIT * TunerConstantsTestBot.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    private static final double JOYSTICK_DEADBAND = 0.05;
+
+    /* Setting up bindings for necessary control of the swerve drive platform */
+    private final SwerveRequest.FieldCentric m_driveRequest = new SwerveRequest.FieldCentric()
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
+    // set the swerve wheels in an X pattern
+    private final SwerveRequest.SwerveDriveBrake m_brakeRequest = new SwerveRequest.SwerveDriveBrake();
+    // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+    private final Telemetry m_logger = new Telemetry(MAX_SPEED);
+
+    private AutoCommandInterface m_autoCommand;
+    private AutoVisualizer m_autoVisualizer = null;
+
+    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
+    // private final CommandJoystick m_farm = new CommandJoystick(1);
+
+    private final CommandSwerveDrivetrain m_drivetrain;
+    private final AprilTagVision m_aprilTagVision = new AprilTagVision(Robot.RobotType.TESTBOT, m_logger.getField2d());
+
+    private final SendableChooser<String> m_chosenFieldSide = new SendableChooser<>();
+    private int m_autoSelectionCode = Integer.MIN_VALUE; 
+    
+    public RobotContainerTestBot() {
+        if (Robot.isSimulation()) {
+            DriverStationBackend.silenceJoystickConnectionWarning(true);
+        }
+        
+        m_drivetrain = new CommandSwerveDrivetrain(
+            m_aprilTagVision,
+            TunerConstantsTestBot.DrivetrainConstants,
+            TunerConstantsTestBot.FrontLeft, TunerConstantsTestBot.FrontRight, TunerConstantsTestBot.BackLeft, TunerConstantsTestBot.BackRight
+        );
+
+        m_drivetrain.setupPathPlanner();
+
+        configureBindings();
+
+        configureAutos();
+    }
+
+    private void configureAutos() {
+        m_chosenFieldSide.setDefaultOption("Depot Side", "Depot Side");
+        m_chosenFieldSide.addOption("Outpost Side", "Outpost Side");
+
+        SmartDashboard.putData("Field Side", m_chosenFieldSide);
+    }
+
+    private void configureBindings() {
+        m_drivetrain.setDefaultCommand(getDriveCommand());
+
+        // Idle while the robot is disabled. This ensures the configured
+        // neutral mode is applied to the drive motors while disabled.
+        final var idle = new SwerveRequest.Idle();
+        RobotModeTriggers.disabled().whileTrue(
+            m_drivetrain.applyRequest(() -> idle).ignoringDisable(true)
+        );
+
+        // lock wheels
+        m_driverController.a().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
+        // m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
+        //     point.withModuleDirection(new Rotation2d(-m_driverController.getLeftY(), -m_driverController.getLeftX()))
+        // ));
+
+        // Run SysId routines when holding back/start and X/Y.
+        // Note that each routine should be run exactly once in a single log.
+        m_driverController.back().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdDynamic(Direction.kForward));
+        m_driverController.back().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdDynamic(Direction.kReverse));
+        m_driverController.start().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.kForward));
+        m_driverController.start().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        // Reset the field-centric heading on left bumper press.
+        m_driverController.leftBumper().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
+
+        m_drivetrain.registerTelemetry(m_logger::telemeterize);
+    }
+
+    public CommandSwerveDrivetrain getDriveTrain() {
+        return m_drivetrain;
+    }
+
+    public Command getAutonomousCommand() {
+        String selectedFieldSide = m_chosenFieldSide.getSelected();
+        int currentAutoSelectionCode = Objects.hash(selectedFieldSide,
+            MatchState.getAlliance());
+        List<Object> pathFiles = List.of(
+            "Start Bump to Fuel Begin",
+            "Fuel Begin to Fuel End With Events",
+            "Fuel End to Bump Finish With Events",
+            "Bump Finish to Climb A"
+        );
+
+        // Only call constructor if the auto selection inputs have changed
+        if (m_autoSelectionCode != currentAutoSelectionCode) {
+            boolean isDepotSide = selectedFieldSide.equals("Depot Side");
+            m_autoSelectionCode = currentAutoSelectionCode;
+
+            m_autoVisualizer = new AutoVisualizer(m_drivetrain.getPPRobotConfig());
+            m_autoCommand = CoreAuto.getInstance(pathFiles, m_drivetrain, isDepotSide, null, m_autoVisualizer);
+
+            SmartDashboard.putString("Selected Auto", "TestBot Auto");
+            m_autoVisualizer.registerAndStart(m_logger.getField2d());
+        }
+
+        return m_autoCommand;
+    }
+
+    public Pose2d getInitialPose() {
+        return ((AutoCommandInterface) getAutonomousCommand()).getInitialPose();
+    }    
+
+    public void updateAutoPreview() {
+        if (m_autoVisualizer != null) {
+            m_autoVisualizer.update();
+        }
+    }
+    
+    public void clearAutoPreview() {
+        if (m_autoVisualizer != null) {
+            m_autoVisualizer.clear();
+        }
+    }
+    
+    public Command getDriveCommand() {
+        // The controls are for field-oriented driving:
+        // Left stick Y axis -> forward and backwards movement
+        // Left stick X axis -> left and right movement
+        // Right stick X axis -> rotation
+
+        return m_drivetrain.applyRequest(() ->
+                m_driveRequest.withVelocityX(-conditionAxis(m_driverController.getLeftY()) * MAX_SPEED)
+                    .withVelocityY(-conditionAxis(m_driverController.getLeftX()) * MAX_SPEED)
+                    .withRotationalRate(-conditionAxis(m_driverController.getRightX()) * MAX_ANGULAR_RATE)
+            );
+    }
+
+    private double conditionAxis(double value) {
+        value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
+        // Square the axis, retaining the sign
+        return Math.abs(value) * value;
+    }
+}
