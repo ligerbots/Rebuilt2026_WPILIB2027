@@ -33,27 +33,27 @@ import first.robot.utilities.HubShiftUtil;
 
 public class Robot extends OpModeRobot {
     private static final double SPEED_LIMIT = 1.0;
-    private double MAX_SPEED = SPEED_LIMIT * TunerConstantsCompBot.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public static final double MAX_SPEED = SPEED_LIMIT * TunerConstantsCompBot.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    public static final double MAX_ANGULAR_RATE = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    private final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED);
+    public final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED);
 
-    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
-    private final CommandJoystick m_farm = new CommandJoystick(1);
+    public final CommandNiDsXboxController driverController = new CommandNiDsXboxController(0);
+    public final CommandJoystick farm = new CommandJoystick(1);
 
-    private final CommandSwerveDrivetrain m_drivetrain;
-    private final AprilTagVision m_aprilTagVision;
-    private final ShooterFeeder m_shooterFeeder = new ShooterFeeder();
-    private final Shooter m_shooter = new Shooter();
-    private final Turret m_turret = new Turret(m_swerveLogger.getField2d());
-    private final Intake m_intake = new Intake();
-    private final Hopper m_hopper;
+    public final CommandSwerveDrivetrain drivetrain;
+    public final AprilTagVision aprilTagVision;
+    public final ShooterFeeder shooterFeeder = new ShooterFeeder();
+    public final Shooter shooter = new Shooter();
+    public final Turret turret = new Turret(m_swerveLogger.getField2d());
+    public final Intake intake = new Intake();
+    public final Hopper hopper;
 
     // not used directly, but the periodic() method logs data
     @SuppressWarnings("unused")
     private final DataLogger m_dataLogger = new DataLogger();
 
-    public static final String TESTBOT_SERIAL_NUMBER = "0313baff"; // TODO: real value?
+    public static final String TESTBOT_SERIAL_NUMBER = "0313baff";
     public static final String COMPBOT_SERIAL_NUMBER = "030fc268";
 
     public enum RobotType {
@@ -83,25 +83,26 @@ public class Robot extends OpModeRobot {
         // Create the subsystems (aka Mechanisms)
         // If there are differences between robots, create the correct version here
 
-        m_aprilTagVision = new AprilTagVision(m_robotType, m_swerveLogger.getField2d());
+        aprilTagVision = new AprilTagVision(m_robotType, m_swerveLogger.getField2d());
 
         if (m_robotType == RobotType.TESTBOT) {
-            m_drivetrain = new CommandSwerveDrivetrain(
-                    m_aprilTagVision,
+            drivetrain = new CommandSwerveDrivetrain(
+                    aprilTagVision,
                     TunerConstantsTestBot.DrivetrainConstants,
                     TunerConstantsTestBot.FrontLeft, TunerConstantsTestBot.FrontRight, TunerConstantsTestBot.BackLeft,
                     TunerConstantsTestBot.BackRight);
         } else {
-            m_drivetrain = new CommandSwerveDrivetrain(
-                    m_aprilTagVision,
+            drivetrain = new CommandSwerveDrivetrain(
+                    aprilTagVision,
                     TunerConstantsCompBot.DrivetrainConstants,
                     TunerConstantsCompBot.FrontLeft, TunerConstantsCompBot.FrontRight, TunerConstantsCompBot.BackLeft,
                     TunerConstantsCompBot.BackRight);
         }
 
-        m_hopper = new Hopper(m_drivetrain::getRobotCentricVelocity); 
+        hopper = new Hopper(drivetrain::getRobotCentricVelocity); 
 
-        m_drivetrain.setupPathPlanner();
+        drivetrain.setupPathPlanner();
+        drivetrain.registerTelemetry(m_swerveLogger::telemeterize);
     }
 
     private void determineRobotType() {
