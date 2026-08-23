@@ -21,7 +21,14 @@ public class NonZachTeleop extends CompetitionTeleop {
     private SlewRateLimiter m_yLimiter = new SlewRateLimiter(JOYSTICK_MAX_SLEW_RATE);
     private SlewRateLimiter m_rotationLimiter = new SlewRateLimiter(JOYSTICK_MAX_SLEW_RATE);
 
+    private final double m_speedScale;
+
     public NonZachTeleop(Robot robot) {
+        this(robot, 1.0);
+    }
+
+    public NonZachTeleop(Robot robot, double speedScale) {
+        m_speedScale = speedScale;
         super(robot);
     }
 
@@ -31,9 +38,9 @@ public class NonZachTeleop extends CompetitionTeleop {
     void driveBindings() {
         m_robot.drivetrain.setDefaultCommand(
                 m_robot.drivetrain.applyRequest(() ->
-                m_driveRequest.withVelocityX(-conditionAxis(m_robot.driverController.getLeftY(), m_xLimiter) * Robot.MAX_SPEED)
-                    .withVelocityY(-conditionAxis(m_robot.driverController.getLeftX(), m_yLimiter) * Robot.MAX_SPEED)
-                    .withRotationalRate(-conditionAxis(m_robot.driverController.getRightX(), m_rotationLimiter) * Robot.MAX_ANGULAR_RATE)
+                m_driveRequest.withVelocityX(-conditionAxis(m_robot.driverController.getLeftY(), m_xLimiter) * Robot.MAX_SPEED * m_speedScale)
+                    .withVelocityY(-conditionAxis(m_robot.driverController.getLeftX(), m_yLimiter) * Robot.MAX_SPEED * m_speedScale)
+                    .withRotationalRate(-conditionAxis(m_robot.driverController.getRightX(), m_rotationLimiter) * Robot.MAX_ANGULAR_RATE * m_speedScale)
                 ));
 
         // Idle while the robot is disabled. This ensures the configured
