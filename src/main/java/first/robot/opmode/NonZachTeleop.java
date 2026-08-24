@@ -1,5 +1,6 @@
 package first.robot.opmode;
 
+import org.wpilib.command2.button.CommandNiDsXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.util.MathUtil;
@@ -8,6 +9,7 @@ import org.wpilib.opmode.Teleop;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import first.robot.Robot;
+import first.robot.subsystems.CommandSwerveDrivetrain;
 
 @Teleop
 public class NonZachTeleop extends CompetitionTeleop {
@@ -36,18 +38,22 @@ public class NonZachTeleop extends CompetitionTeleop {
     // Include slewRateLimiters to smooth the control
     @Override
     void driveBindings() {
-        m_robot.drivetrain.setDefaultCommand(
-                m_robot.drivetrain.applyRequest(() ->
-                m_driveRequest.withVelocityX(-conditionAxis(m_robot.driverController.getLeftY(), m_xLimiter) * Robot.MAX_SPEED * m_speedScale)
-                    .withVelocityY(-conditionAxis(m_robot.driverController.getLeftX(), m_yLimiter) * Robot.MAX_SPEED * m_speedScale)
-                    .withRotationalRate(-conditionAxis(m_robot.driverController.getRightX(), m_rotationLimiter) * Robot.MAX_ANGULAR_RATE * m_speedScale)
+        // for convenience here, since they are used so frequently below
+        CommandNiDsXboxController driverController = m_robot.getDriverController();
+        CommandSwerveDrivetrain drivetrain = m_robot.getDrivetrain();
+
+        drivetrain.setDefaultCommand(
+                drivetrain.applyRequest(() ->
+                m_driveRequest.withVelocityX(-conditionAxis(driverController.getLeftY(), m_xLimiter) * Robot.MAX_SPEED * m_speedScale)
+                    .withVelocityY(-conditionAxis(driverController.getLeftX(), m_yLimiter) * Robot.MAX_SPEED * m_speedScale)
+                    .withRotationalRate(-conditionAxis(driverController.getRightX(), m_rotationLimiter) * Robot.MAX_ANGULAR_RATE * m_speedScale)
                 ));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
         final var idle = new SwerveRequest.Idle();
         RobotModeTriggers.disabled().whileTrue(
-                m_robot.drivetrain.applyRequest(() -> idle).ignoringDisable(true));
+                drivetrain.applyRequest(() -> idle).ignoringDisable(true));
     }
 
     private double conditionAxis(double value, SlewRateLimiter limiter) {

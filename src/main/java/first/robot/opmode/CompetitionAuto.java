@@ -231,8 +231,8 @@ public class CompetitionAuto extends PeriodicOpMode {
     }
 
     private void configureAutoEventTriggers() {
-        new EventTrigger("Run Intake").onTrue(m_robot.intake.deployAndRollCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", true))));
-        new EventTrigger("Stop Intake").onTrue(m_robot.intake.stowCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", false))));
+        new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", true))));
+        new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", false))));
 
         new EventTrigger("Shooter Running").whileTrue(m_robot.shootCommand(ShotType.AUTO));
         new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", false)));
@@ -250,6 +250,10 @@ public class CompetitionAuto extends PeriodicOpMode {
         // Only call constructor if the auto selection inputs have changed
         if (m_autoSelectionCode == currentAutoSelectionCode) return;
 
+        // can't do much without a drivetrain
+        CommandSwerveDrivetrain driveTrain = m_robot.getDrivetrain();
+        if (driveTrain == null) return;
+
         // double startT = Timer.getMonotonicTimestamp();
 
         m_autoSelectionCode = currentAutoSelectionCode;
@@ -257,15 +261,15 @@ public class CompetitionAuto extends PeriodicOpMode {
         List<Object> selectedAutoPaths = m_autoPathOptions.get(selectedAutoName);
         boolean isOutpostSide = selectedFieldSide.equals("Outpost Side");
 
-        m_autoVisualizer = new AutoVisualizer(m_robot.drivetrain.getPPRobotConfig());
-        m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, m_robot.drivetrain, isOutpostSide, m_virtualShootButton, m_autoVisualizer);
+        m_autoVisualizer = new AutoVisualizer(driveTrain.getPPRobotConfig());
+        m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, driveTrain, isOutpostSide, m_virtualShootButton,
+                m_autoVisualizer);
 
         SmartDashboard.putString("Selected Auto", selectedAutoName);
         m_autoVisualizer.registerAndStart(m_robot.getField2d());
         // System.out.println("*** Build Auto command took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
-        // drivetrain might be null when testing code. So check
-        CommandSwerveDrivetrain driveTrain = m_robot.drivetrain;
-        if (driveTrain != null) driveTrain.setPose(m_autoCommand.getInitialPose());
+
+        driveTrain.setPose(m_autoCommand.getInitialPose());
     }
 
     public Pose2d getInitialPose() {
