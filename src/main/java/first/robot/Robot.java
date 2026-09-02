@@ -6,7 +6,11 @@ package first.robot;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.driverstation.DriverStation;
+import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.RobotState;
+import org.wpilib.driverstation.Alliance;
+import org.wpilib.driverstation.MatchType;
+import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.smartdashboard.SmartDashboard;
@@ -142,7 +146,7 @@ public class Robot extends TimedRobot {
     public void teleopExit() {}
 
     // @Override
-    // public void testInit() {
+    // public void utilityInit() {
     //     CommandScheduler.getInstance().cancelAll();
     // }
 
