@@ -47,7 +47,7 @@ public class RobotContainerTestBot extends RobotContainer {
     private final SwerveRequest.SwerveDriveBrake m_brakeRequest = new SwerveRequest.SwerveDriveBrake();
     // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry m_logger = new Telemetry(MAX_SPEED);
+    private final SwerveTelemetry m_logger = new SwerveTelemetry(MAX_SPEED);
 
     private AutoCommandInterface m_autoCommand;
     private AutoVisualizer m_autoVisualizer = null;

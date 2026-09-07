@@ -19,7 +19,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 
-public class Telemetry {
+public class SwerveTelemetry {
     private final double MaxSpeed;
 
     /* What to publish over networktables for telemetry */
@@ -68,7 +68,7 @@ public class Telemetry {
      * 
      * @param maxSpeed Maximum speed in meters per second
      */
-    public Telemetry(double maxSpeed) {
+    public SwerveTelemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
         SignalLogger.start();
 

@@ -15,6 +15,7 @@ import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.DataLogManager;
+import org.wpilib.telemetry.Telemetry;
 
 import com.ctre.phoenix6.HootAutoReplay;
 
