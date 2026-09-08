@@ -65,18 +65,18 @@ public class PulseHopper extends Command {
             m_hopper.feed();
         }
 
-        SmartDashboard.putBoolean("hopper/pulseActive", m_isPulsing);
-        SmartDashboard.putBoolean("hopper/shooterLatched", m_shooterOnTarget);
-        SmartDashboard.putBoolean("hopper/startupReverseActive", m_startupReverseActive);
+        Telemetry.log("hopper/pulseActive", m_isPulsing);
+        Telemetry.log("hopper/shooterLatched", m_shooterOnTarget);
+        Telemetry.log("hopper/startupReverseActive", m_startupReverseActive);
     }
 
     @Override
     public void end(boolean interrupted) {
         m_hopper.stop();
         m_startupReverseTimer.stop();
-        SmartDashboard.putBoolean("hopper/pulseActive", false);
-        SmartDashboard.putBoolean("hopper/shooterLatched", false);
-        SmartDashboard.putBoolean("hopper/startupReverseActive", false);
+        Telemetry.log("hopper/pulseActive", false);
+        Telemetry.log("hopper/shooterLatched", false);
+        Telemetry.log("hopper/startupReverseActive", false);
     }
 
     @Override

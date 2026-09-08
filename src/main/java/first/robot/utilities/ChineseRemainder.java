@@ -89,11 +89,11 @@ public class ChineseRemainder {
 
         double gear1remainder = middleTeeth % gear1teeth;
         double gear1offsetToApply = gear1remainder / gear1teeth - gear1rotations;
-        SmartDashboard.putNumber("CRT/abs1OffsetRotation", gear1offsetToApply);
+        Telemetry.log("CRT/abs1OffsetRotation", gear1offsetToApply);
 
         double gear2remainder = middleTeeth % gear2teeth;
         double gear2offsetToApply = gear2remainder / gear2teeth - gear2rotations;
-        SmartDashboard.putNumber("CRT/abs2OffsetRotation", gear2offsetToApply);
+        Telemetry.log("CRT/abs2OffsetRotation", gear2offsetToApply);
     }
 
     private static double wrapRotation(double rot) {

@@ -86,13 +86,13 @@ public class Hood extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("hood/currentAngle", getAngle().getDegrees());
+        Telemetry.log("hood/currentAngle", getAngle().getDegrees());
 
         // Commanded state
-        SmartDashboard.putNumber("hood/goalAngle", m_goalDeg);
+        Telemetry.log("hood/goalAngle", m_goalDeg);
 
         // Raw sensor/debug
-        // SmartDashboard.putNumber("hood/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
+        // Telemetry.log("hood/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
     }
     
     public void setAngle(Rotation2d angle) {

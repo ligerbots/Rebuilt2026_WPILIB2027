@@ -161,20 +161,20 @@ public class Turret extends SubsystemBase {
         double currentAngle = getAngle().getDegrees();
 
         // Driver-facing status
-        SmartDashboard.putNumber("turret/currentAngle", currentAngle);
-        SmartDashboard.putNumber("turret/fudgeAngle", m_turretFudgeDegrees);
+        Telemetry.log("turret/currentAngle", currentAngle);
+        Telemetry.log("turret/fudgeAngle", m_turretFudgeDegrees);
 
         // Tracking state
-        SmartDashboard.putNumber("turret/angleError", goal - currentAngle);
+        Telemetry.log("turret/angleError", goal - currentAngle);
 
         // Motor electrical/motion data
-        SmartDashboard.putNumber("turret/voltage", m_turretMotor.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("turret/velocityRPS", m_turretMotor.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("turret/accelRPS2", m_turretMotor.getAcceleration().getValueAsDouble());
+        Telemetry.log("turret/voltage", m_turretMotor.getMotorVoltage().getValueAsDouble());
+        Telemetry.log("turret/velocityRPS", m_turretMotor.getVelocity().getValueAsDouble());
+        Telemetry.log("turret/accelRPS2", m_turretMotor.getAcceleration().getValueAsDouble());
 
         // Values for testing and tuning
-        // SmartDashboard.putNumber("turret/crtAngleRaw",getCRTAngleRaw().getDegrees());   
-        // SmartDashboard.putNumber("turret/crtAngle",getCRTAngle().getDegrees());
+        // Telemetry.log("turret/crtAngleRaw",getCRTAngleRaw().getDegrees());   
+        // Telemetry.log("turret/crtAngle",getCRTAngle().getDegrees());
         
         // USE ME FOR TUNING ABSOLUTE ENCODER OFFSETS ONLY:
         // ChineseRemainder.smartDashboardLogABSOffsets(ENCODER_SMALL_TOOTH_COUNT, ENCODER_LARGE_TOOTH_COUNT, 
@@ -205,8 +205,8 @@ public class Turret extends SubsystemBase {
         m_turretMotor.setControl(m_positionControl);
 
         // update these log items right away
-        SmartDashboard.putNumber("turret/shootAngle", m_shootAngle + TURRET_HEADING_OFFSET_DEG);
-        SmartDashboard.putNumber("turret/goalAngle", m_goalDeg + TURRET_HEADING_OFFSET_DEG);
+        Telemetry.log("turret/shootAngle", m_shootAngle + TURRET_HEADING_OFFSET_DEG);
+        Telemetry.log("turret/goalAngle", m_goalDeg + TURRET_HEADING_OFFSET_DEG);
     }
     
     // get angle of turret

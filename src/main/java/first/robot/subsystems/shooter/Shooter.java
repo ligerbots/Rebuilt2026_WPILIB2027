@@ -65,8 +65,8 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver tuning controls
-        SmartDashboard.putNumber("shooter/flywheelFudge", m_flyFudge);
-        SmartDashboard.putNumber("shooter/hoodFudge", m_hoodFudgeDegree);
+        Telemetry.log("shooter/flywheelFudge", m_flyFudge);
+        Telemetry.log("shooter/hoodFudge", m_hoodFudgeDegree);
     }
 
     public Flywheel getFlywheel() {

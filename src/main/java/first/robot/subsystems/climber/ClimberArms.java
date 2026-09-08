@@ -76,8 +76,8 @@ public class ClimberArms extends SubsystemBase {
 
         //TODO comment out when no longer testing
 
-        SmartDashboard.putNumber("ClimberArms/setLeft", 0);
-        SmartDashboard.putNumber("ClimberArms/setRight", 0);
+        Telemetry.log("ClimberArms/setLeft", 0);
+        Telemetry.log("ClimberArms/setRight", 0);
 
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
 
@@ -127,13 +127,13 @@ public class ClimberArms extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("ClimberArms/onTargetLeft", onTarget(MotorSelection.LEFT));
-        SmartDashboard.putNumber("ClimberArms/goalDistanceLeft", m_goalDistanceLeft);
-        SmartDashboard.putNumber("ClimberArms/currentDistanceLeft", getCurrentDistance(MotorSelection.LEFT));
+        Telemetry.log("ClimberArms/onTargetLeft", onTarget(MotorSelection.LEFT));
+        Telemetry.log("ClimberArms/goalDistanceLeft", m_goalDistanceLeft);
+        Telemetry.log("ClimberArms/currentDistanceLeft", getCurrentDistance(MotorSelection.LEFT));
         
-        SmartDashboard.putBoolean("ClimberArms/onTargetRight", onTarget(MotorSelection.RIGHT));
-        SmartDashboard.putNumber("ClimberArms/goalDistanceRight", m_goalDistanceRight);
-        SmartDashboard.putNumber("ClimberArms/currentDistanceRight", getCurrentDistance(MotorSelection.RIGHT));
+        Telemetry.log("ClimberArms/onTargetRight", onTarget(MotorSelection.RIGHT));
+        Telemetry.log("ClimberArms/goalDistanceRight", m_goalDistanceRight);
+        Telemetry.log("ClimberArms/currentDistanceRight", getCurrentDistance(MotorSelection.RIGHT));
     }
 
 

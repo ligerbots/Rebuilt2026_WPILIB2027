@@ -89,16 +89,16 @@ public class IntakeRoller extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("intake/RPM", getRPM()); 
+        Telemetry.log("intake/RPM", getRPM()); 
         
         // Commanded state
-        SmartDashboard.putNumber("intake/goalRPM", m_goalRPM);
-        SmartDashboard.putNumber("intake/voltageFudge", m_intakeRPMScale);
+        Telemetry.log("intake/goalRPM", m_goalRPM);
+        Telemetry.log("intake/voltageFudge", m_intakeRPMScale);
 
         // Motor electrical data
-        SmartDashboard.putNumber("intake/voltage", m_motor.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("intake/rollerSupply", m_motor.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("intake/rollerStator", m_motor.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("intake/voltage", m_motor.getMotorVoltage().getValueAsDouble());
+        Telemetry.log("intake/rollerSupply", m_motor.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("intake/rollerStator", m_motor.getStatorCurrent().getValueAsDouble());
     }
          
     public double getRPM(){

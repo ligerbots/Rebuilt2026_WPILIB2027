@@ -120,11 +120,11 @@ public class AprilTagVision {
     public AprilTagVision(RobotType robotType, Field2d field) {
         try {
             m_aprilTagFieldLayout = AprilTagFieldLayout.loadField(APRILTAG_FIELD);
-            SmartDashboard.putString("aprilTagVision/field", APRILTAG_FIELD.toString());
+            Telemetry.log("aprilTagVision/field", APRILTAG_FIELD.toString());
 
             // String fieldpath = Filesystem.getDeployDirectory().getPath() + "/" + CUSTOM_FIELD;
             // m_aprilTagFieldLayout = new AprilTagFieldLayout(fieldpath);
-            // SmartDashboard.putString("aprilTagVision/field", CUSTOM_FIELD);
+            // Telemetry.log("aprilTagVision/field", CUSTOM_FIELD);
         } catch (UncheckedIOException e) {
             System.out.println("Unable to load AprilTag layout " + e.getMessage());
             m_aprilTagFieldLayout = null;
@@ -198,7 +198,7 @@ public class AprilTagVision {
             ArrayList<CameraMeasurement> camFrames = new ArrayList<CameraMeasurement>();
             for (Camera cam : m_cameras) {
                 boolean isConnected = cam.photonCamera.isConnected();
-                SmartDashboard.putBoolean("aprilTagVision/" + cam.photonCamera.getName(), isConnected);
+                Telemetry.log("aprilTagVision/" + cam.photonCamera.getName(), isConnected);
                 if (!isConnected)
                     continue;
 
@@ -279,9 +279,9 @@ public class AprilTagVision {
                         globalMeasurements.add(pose);
 
                         // // Debugging logging
-                        // SmartDashboard.putNumber("aprilTagVision/poseEstDX", pose.getX() - currentPose.getX());
-                        // SmartDashboard.putNumber("aprilTagVision/poseEstDY", pose.getY() - currentPose.getY());
-                        // SmartDashboard.putNumber("aprilTagVision/poseEstDR", pose.getRotation().getDegrees() - currentPose.getRotation().getDegrees());
+                        // Telemetry.log("aprilTagVision/poseEstDX", pose.getX() - currentPose.getX());
+                        // Telemetry.log("aprilTagVision/poseEstDY", pose.getY() - currentPose.getY());
+                        // Telemetry.log("aprilTagVision/poseEstDR", pose.getRotation().getDegrees() - currentPose.getRotation().getDegrees());
                     }
                 } catch (Exception e) {
                     // bad! log this and keep going

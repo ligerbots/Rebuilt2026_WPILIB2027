@@ -138,7 +138,7 @@ public class RobotContainerTestBot extends RobotContainer {
             m_autoVisualizer = new AutoVisualizer(m_drivetrain.getPPRobotConfig());
             m_autoCommand = CoreAuto.getInstance(pathFiles, m_drivetrain, isDepotSide, null, m_autoVisualizer);
 
-            SmartDashboard.putString("Selected Auto", "TestBot Auto");
+            Telemetry.log("Selected Auto", "TestBot Auto");
             m_autoVisualizer.registerAndStart(m_logger.getField2d());
         }
 

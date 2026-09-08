@@ -110,9 +110,9 @@ public class ChainClimber extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("ClimberArms/onTarget", onTarget());
-        SmartDashboard.putNumber("ClimberArms/goalDistance", m_goalDistance);
-        SmartDashboard.putNumber("ClimberArms/currentDistance", getCurrentDistance());
+        Telemetry.log("ClimberArms/onTarget", onTarget());
+        Telemetry.log("ClimberArms/goalDistance", m_goalDistance);
+        Telemetry.log("ClimberArms/currentDistance", getCurrentDistance());
     }
 
 

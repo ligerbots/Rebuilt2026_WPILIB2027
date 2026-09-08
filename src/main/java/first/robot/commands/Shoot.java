@@ -82,10 +82,10 @@ public class Shoot extends Command {
         m_fixedShotVector = new Translation2d(Units.inchesToMeters(shotDistanceInches), turretHeading);
 
         // SD values used in the Test command
-        SmartDashboard.putNumber("hood/testAngle", 0.0);
-        SmartDashboard.putNumber("flywheel/testRPM", 0.0); 
-        SmartDashboard.putNumber("kicker/testRPM", 0.0); 
-        SmartDashboard.putBoolean("shoot/inTrenchZone", false);
+        Telemetry.log("hood/testAngle", 0.0);
+        Telemetry.log("flywheel/testRPM", 0.0); 
+        Telemetry.log("kicker/testRPM", 0.0); 
+        Telemetry.log("shoot/inTrenchZone", false);
     }
 
     public Shoot(Shooter shooter, Turret turret, ShooterFeeder feeder,
@@ -116,7 +116,7 @@ public class Shoot extends Command {
         Translation2d robotTranslation = robotPose.getTranslation();
 
         boolean inTrench = inTrenchZone(robotTranslation);
-        SmartDashboard.putBoolean("shoot/inTrenchZone", inTrench);
+        Telemetry.log("shoot/inTrenchZone", inTrench);
         if (inTrench) {
             //lower hood and stop feeder belts if robot is going under trench
             m_shooter.getHood().setAngle(Rotation2d.kZero);
@@ -155,7 +155,7 @@ public class Shoot extends Command {
         m_shooter.setShootValues(shotValue);
         m_feeder.setKickerRPM(shotValue.feedRPM);
         
-        SmartDashboard.putNumber("shoot/shotAngle", angle.getDegrees());
+        Telemetry.log("shoot/shotAngle", angle.getDegrees());
 
         if (!m_shooterOnTarget && m_shooter.onTarget()) {
             m_shooterOnTarget = true;
@@ -348,13 +348,13 @@ public class Shoot extends Command {
     }
 
     public Translation2d findMovingShotVector(Pose2d currentPose, Translation2d target, ShotType effectiveShotType) {
-        // SmartDashboard.putString("shoot/effectiveShotType", effectiveShotType.toString());
-        // SmartDashboard.putNumber("shoot/targetX", target.getX());
+        // Telemetry.log("shoot/effectiveShotType", effectiveShotType.toString());
+        // Telemetry.log("shoot/targetX", target.getX());
         ChassisVelocities speedInformation = m_speedsSupplier.get();
         Translation2d robotVelVector = new Translation2d(speedInformation.vx, speedInformation.vy);
 
-        SmartDashboard.putNumber("shoot/robotVel", robotVelVector.getNorm());
-        SmartDashboard.putNumber("shoot/robotOmega", speedInformation.omega);
+        Telemetry.log("shoot/robotVel", robotVelVector.getNorm());
+        Telemetry.log("shoot/robotOmega", speedInformation.omega);
 
         Pose2d futureRobotPose = new Pose2d(
             currentPose.getTranslation().plus(robotVelVector.times(LATENCY_SECONDS_TRANSLATION)),
@@ -416,8 +416,8 @@ public class Shoot extends Command {
 
         HubShiftUtil.setShotContext(timeOfFlight, effectiveShotType == ShotType.HUB);
 
-        SmartDashboard.putNumber("shoot/tof", timeOfFlight);
-        SmartDashboard.putNumber("shoot/targetDistance", targetDistance);
+        Telemetry.log("shoot/tof", timeOfFlight);
+        Telemetry.log("shoot/targetDistance", targetDistance);
 
         return targetVector;
     }

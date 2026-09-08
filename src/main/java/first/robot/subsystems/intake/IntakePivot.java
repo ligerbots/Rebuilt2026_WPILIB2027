@@ -114,18 +114,18 @@ public class IntakePivot extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("intake/deployAngle", getAngle().getDegrees());
-        SmartDashboard.putBoolean("intake/onTarget", onTarget());
+        Telemetry.log("intake/deployAngle", getAngle().getDegrees());
+        Telemetry.log("intake/onTarget", onTarget());
 
         // Commanded state
-        SmartDashboard.putNumber("intake/deployGoal", m_goal.getDegrees());
+        Telemetry.log("intake/deployGoal", m_goal.getDegrees());
 
         // Motor electrical data
-        SmartDashboard.putNumber("intake/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("intake/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("intake/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("intake/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
 
         // Raw sensor/debug
-        // SmartDashboard.putNumber("intake/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
+        // Telemetry.log("intake/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
     }
 
     public void setPositionToDeployed() {

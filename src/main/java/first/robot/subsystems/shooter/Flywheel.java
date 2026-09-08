@@ -113,31 +113,31 @@ public class Flywheel extends SubsystemBase {
         updateJamTime(now);        
 
         // Driver-facing status
-        SmartDashboard.putBoolean("flywheel/shotDetected", isShotDetected());
-        SmartDashboard.putBoolean("flywheel/jammed", isCurrentJamDetected());
-        SmartDashboard.putNumber("flywheel/currentRPM", getRPM());
+        Telemetry.log("flywheel/shotDetected", isShotDetected());
+        Telemetry.log("flywheel/jammed", isCurrentJamDetected());
+        Telemetry.log("flywheel/currentRPM", getRPM());
 
 
         // Speed and setpoint
-        SmartDashboard.putNumber("flywheel/goalRPM", m_goalRPM);
+        Telemetry.log("flywheel/goalRPM", m_goalRPM);
 
         // Detection state
-        SmartDashboard.putBoolean("flywheel/shotDetectionArmed", m_shotDetectionArmed);
-        SmartDashboard.putBoolean("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
-        SmartDashboard.putNumber("flywheel/jamGrace", m_jamGrace);
-        SmartDashboard.putBoolean("flywheel/currentJamDetected", isCurrentJamDetected());
+        Telemetry.log("flywheel/shotDetectionArmed", m_shotDetectionArmed);
+        Telemetry.log("flywheel/jamDetectionArmed", isJamDetectionArmed(now));
+        Telemetry.log("flywheel/jamGrace", m_jamGrace);
+        Telemetry.log("flywheel/currentJamDetected", isCurrentJamDetected());
 
         // Motor electrical data
-        SmartDashboard.putNumber("flywheel/leaderStator", m_motor.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("flywheel/followerStator", m_follower.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("flywheel/leaderSupply", m_motor.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("flywheel/followerSupply", m_follower.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("flywheel/leaderTorqueCurrent", m_motor.getTorqueCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("flywheel/followerTorqueCurrent", m_follower.getTorqueCurrent().getValueAsDouble());
+        Telemetry.log("flywheel/leaderStator", m_motor.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("flywheel/followerStator", m_follower.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("flywheel/leaderSupply", m_motor.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("flywheel/followerSupply", m_follower.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("flywheel/leaderTorqueCurrent", m_motor.getTorqueCurrent().getValueAsDouble());
+        Telemetry.log("flywheel/followerTorqueCurrent", m_follower.getTorqueCurrent().getValueAsDouble());
 
         // Derived current metrics
-        SmartDashboard.putNumber("flywheel/totalTorqueCurrent", getTotalTorqueCurrent());
-        SmartDashboard.putNumber("flywheel/avgTorqueCurrent", getAverageTorqueCurrent());
+        Telemetry.log("flywheel/totalTorqueCurrent", getTotalTorqueCurrent());
+        Telemetry.log("flywheel/avgTorqueCurrent", getAverageTorqueCurrent());
     }
     
     public void setVoltage(double voltage) {

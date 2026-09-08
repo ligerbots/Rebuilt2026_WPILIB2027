@@ -6,14 +6,9 @@ package first.robot;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.driverstation.MatchState;
-import org.wpilib.driverstation.RobotState;
-import org.wpilib.driverstation.Alliance;
-import org.wpilib.driverstation.MatchType;
-import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.driverstation.DriverStation;
 import org.wpilib.framework.TimedRobot;
 import org.wpilib.hardware.hal.HALUtil;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.DataLogManager;
 import org.wpilib.telemetry.Telemetry;
 
@@ -50,7 +45,7 @@ public class Robot extends TimedRobot {
         // Figure out which roboRio this is, so we know which version of the robot
         //   code to run.
         String serialNum = HALUtil.getSerialNumber();
-        SmartDashboard.putString("rioSerialNumber", serialNum);
+        Telemetry.log("rioSerialNumber", serialNum);
         if (serialNum.equals(TESTBOT_SERIAL_NUMBER)) {
             m_robotType = RobotType.TESTBOT;
         } else if (serialNum.equals(COMPBOT_SERIAL_NUMBER)) {
@@ -59,7 +54,7 @@ public class Robot extends TimedRobot {
             // default to the Test robot unless we're running in simulation
             m_robotType = isSimulation() ? RobotType.COMPBOT : RobotType.TESTBOT;
         }
-        SmartDashboard.putString("robotType", m_robotType.toString());
+        Telemetry.log("robotType", m_robotType.toString());
 
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.

@@ -40,8 +40,8 @@ public class CoreAuto extends AutoCommandInterface {
 
         m_driveTrain = driveTrain;
 
-        SmartDashboard.putBoolean("autoStatus/runningIntake", false);
-        SmartDashboard.putBoolean("autoStatus/runningShooter", false);
+        Telemetry.log("autoStatus/runningIntake", false);
+        Telemetry.log("autoStatus/runningShooter", false);
 
         try {
             m_initPose = getStartPose(pathSteps, isOutpostSide);
@@ -71,10 +71,10 @@ public class CoreAuto extends AutoCommandInterface {
         return new InstantCommand(() -> virtualShootButton.setPressed(true))
                 .alongWith(new WaitCommand(seconds),
                         new InstantCommand(
-                                () -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)))
+                                () -> Telemetry.log("autoStatus/runningShooter", true)))
                 .andThen(new InstantCommand(() -> virtualShootButton.setPressed(false)),
                         new InstantCommand(
-                                () -> SmartDashboard.putBoolean("autoStatus/runningShooter", false)));
+                                () -> Telemetry.log("autoStatus/runningShooter", false)));
     }
     
     private Pose2d getStartPose(List<Object> pathSteps, boolean isOutpostSide) {
