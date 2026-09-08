@@ -82,7 +82,7 @@ public class Shooter extends SubsystemBase {
     */
     public void stop() {
         m_flywheel.stop();
-        m_hood.setAngle(Rotation2d.kZero);
+        m_hood.setAngle(Rotation2d.ZERO);
     }
     
     public boolean onTarget() {

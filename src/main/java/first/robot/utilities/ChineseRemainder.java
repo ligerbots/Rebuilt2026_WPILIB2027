@@ -3,7 +3,7 @@ package first.robot.utilities;
 import java.util.Random;
 
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * Implements Chinese Remainder Theorem to determine absolute encoder positions from two relative encoders

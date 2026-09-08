@@ -345,7 +345,7 @@ public class Turret extends SubsystemBase {
                     new Pose2d(turretLoc, turretHeadingField),
                     new Pose2d(robotEndLoc, turretHeadingField)
             );
-            m_field.getObject("shotTarget").setPose(new Pose2d(robotEndLoc, Rotation2d.kZero));
+            m_field.getObject("shotTarget").setPose(new Pose2d(robotEndLoc, Rotation2d.ZERO));
 
             m_field.getObject("robotHeading").setPoses(
                     new Pose2d(robotEndLoc, robotMotion.getAngle()),

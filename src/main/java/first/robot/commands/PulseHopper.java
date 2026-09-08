@@ -1,8 +1,8 @@
 package first.robot.commands;
 
 import org.wpilib.command2.Command;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
 
 import first.robot.subsystems.Hopper;
 import first.robot.subsystems.shooter.Shooter;

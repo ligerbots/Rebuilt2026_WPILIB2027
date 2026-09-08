@@ -47,7 +47,7 @@ public class IntakePivot extends SubsystemBase {
 
     private static final Rotation2d PULSE_POSITION = Rotation2d.fromDegrees(10.0);
 
-    private Rotation2d m_goal = Rotation2d.kZero;
+    private Rotation2d m_goal = Rotation2d.ZERO;
 
     private final TalonFX m_motor;
     private final MotionMagicVoltage m_positionControl = new MotionMagicVoltage(0);

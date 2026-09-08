@@ -91,12 +91,12 @@ public class AutoVisualizer {
     private Rotation2d getPathHeading(PathPlannerPath path) {
         List<Pose2d> pathPoses = path.getPathPoses();
         if (pathPoses.size() < 2) {
-            return Rotation2d.kZero;
+            return Rotation2d.ZERO;
         }
 
         Translation2d headingVector = pathPoses.get(1).getTranslation().minus(pathPoses.get(0).getTranslation());
         if (headingVector.getNorm() < 1e-6) {
-            return Rotation2d.kZero;
+            return Rotation2d.ZERO;
         }
 
         return headingVector.getAngle();

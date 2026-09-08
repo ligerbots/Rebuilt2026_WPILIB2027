@@ -4,11 +4,13 @@
 
 package first.robot.subsystems;
 
+import org.wpilib.command2.SubsystemBase;
 // import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.framework.RobotBase;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.system.RobotController;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.telemetry.Telemetry;
+
 import first.robot.utilities.HubShiftUtil;
 
 public class DataLogger extends SubsystemBase {
@@ -24,8 +26,8 @@ public class DataLogger extends SubsystemBase {
         Telemetry.log("power/batteryVoltage", RobotController.getBatteryVoltage());
 
         // Network
-        Telemetry.log("network/CAN Bus Utilization",
-                RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus(0).percentBusUtilization);
+        Telemetry.log("network/CAN0 Bus Utilization",
+                RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus(CANPort.CAN_D0).percentBusUtilization);
 
         HubShiftUtil.ShiftInfo officialShiftInfo = HubShiftUtil.getOfficialShiftInfo();
         HubShiftUtil.ShiftInfo shiftedShiftInfo = HubShiftUtil.getShiftedShiftInfo(HubShiftUtil.getProjectileLeadTimeSec());

@@ -5,19 +5,22 @@
 package first.robot.commands;
 import java.util.function.Supplier;
 
+import org.wpilib.command2.Command;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.util.Units;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.TunableBoolean;
+import org.wpilib.tunable.TunableDouble;
+import org.wpilib.tunable.Tunables;
 
 import first.robot.FieldConstants;
 import first.robot.subsystems.shooter.Shooter;
+import first.robot.subsystems.shooter.Shooter.ShotType;
 import first.robot.subsystems.shooter.ShooterFeeder;
 import first.robot.subsystems.shooter.Turret;
-import first.robot.subsystems.shooter.Shooter.ShotType;
 import first.robot.utilities.HubShiftUtil;
 import first.robot.utilities.ShooterLookupTable.ShootValue;
 
@@ -60,6 +63,12 @@ public class Shoot extends Command {
     private boolean m_shooterOnTarget = false;
     private PassSide m_latchedPassSide = null;
 
+    // Tunable values used in the Test command
+    private final TunableDouble m_hoodTestAngle = Tunables.addDouble("hood/testAngle", 0.0);
+    private final TunableDouble m_flywheelTestRpm = Tunables.addDouble("flywheel/testRPM", 0.0);
+    private final TunableDouble m_kickerTestRpm = Tunables.addDouble("kicker/testRPM", 0.0);
+    private final TunableBoolean m_inTrenchZone = Tunables.addBoolean("shoot/inTrenchZone", false);
+
     // Values for the trench-area lockout code
     // time to use when computing "danger" of velocity
     private static final double TRENCH_SPEED_TIME_SEC = 1.0;
@@ -80,18 +89,12 @@ public class Shoot extends Command {
 
         // fixed shot only
         m_fixedShotVector = new Translation2d(Units.inchesToMeters(shotDistanceInches), turretHeading);
-
-        // SD values used in the Test command
-        Telemetry.log("hood/testAngle", 0.0);
-        Telemetry.log("flywheel/testRPM", 0.0); 
-        Telemetry.log("kicker/testRPM", 0.0); 
-        Telemetry.log("shoot/inTrenchZone", false);
     }
 
     public Shoot(Shooter shooter, Turret turret, ShooterFeeder feeder,
             Supplier<Pose2d> poseSupplier, Supplier<ChassisVelocities> speeds, Shooter.ShotType shotType) {
         this(shooter, turret, feeder,
-                poseSupplier, speeds, shotType, 0.0, Rotation2d.kZero);
+                poseSupplier, speeds, shotType, 0.0, Rotation2d.ZERO);
     }
 
     public Shoot(Shooter shooter, Turret turret, ShooterFeeder feeder,
@@ -119,7 +122,7 @@ public class Shoot extends Command {
         Telemetry.log("shoot/inTrenchZone", inTrench);
         if (inTrench) {
             //lower hood and stop feeder belts if robot is going under trench
-            m_shooter.getHood().setAngle(Rotation2d.kZero);
+            m_shooter.getHood().setAngle(Rotation2d.ZERO);
             m_feeder.stopFeederBelts();
             return; 
         }
@@ -131,7 +134,7 @@ public class Shoot extends Command {
             effectiveShotType = ShotType.HUB;
             
             if (PLOT_SHOT_VISUALIZATION) {
-                m_turret.plotShotVectors(robotPose, shotVector, Translation2d.kZero, Translation2d.kZero);
+                m_turret.plotShotVectors(robotPose, shotVector, Translation2d.ZERO, Translation2d.ZERO);
             }
         } else {    
             ShotSelection shotSelection = targetForShotType(robotPose);
@@ -148,7 +151,7 @@ public class Shoot extends Command {
             shotValue = m_shooter.getShootValue(shotLookupDistance(robotPose, shotVector, effectiveShotType), effectiveShotType);
         }
         
-        Rotation2d angle = shotVector.getAngle();
+        Rotation2d angle = shotVector.getAngle().get();
         shotValue.flyRPM *= FLYWHEEL_SCALE;
 
         m_turret.setAngle(angle);
@@ -369,7 +372,7 @@ public class Shoot extends Command {
         // do the sum directly to save some object constructors
         Rotation2d turretCentripetalDirection = Rotation2d.fromDegrees(
                 futureRobotPose.getRotation().getDegrees() + 
-                Turret.TURRET_OFFSET.getAngle().getDegrees() +
+                Turret.TURRET_OFFSET.getAngle().get().getDegrees() +
                 Math.copySign(90.0, speedInformation.omega));
         
         Translation2d centripetalVelocity = new Translation2d(turretCentripetalSpeed, turretCentripetalDirection);
@@ -449,9 +452,8 @@ public class Shoot extends Command {
 
     private ShootValue testShotValue() {
         return new ShootValue(
-                SmartDashboard.getNumber("flywheel/testRPM", 0.0),
-                SmartDashboard.getNumber("kicker/testRPM", 0.0),
-                Rotation2d.fromDegrees(SmartDashboard.getNumber("hood/testAngle", 0.0)),
+                m_flywheelTestRpm.get(), m_kickerTestRpm.get(),
+                Rotation2d.fromDegrees(m_hoodTestAngle.get()),
                 TEST_TIME_OF_FLIGHT_SEC);
     }
     
