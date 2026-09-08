@@ -6,6 +6,15 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command2.Command;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command2.WaitCommand;
+import org.wpilib.command2.WaitUntilCommand;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -17,14 +26,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.command2.WaitCommand;
-import org.wpilib.command2.WaitUntilCommand;
 import first.robot.Constants;
 
 public class IntakePivot extends SubsystemBase {

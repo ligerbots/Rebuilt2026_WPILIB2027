@@ -8,7 +8,7 @@ import static org.wpilib.units.Units.Amps;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.units.measure.Current;
 
 import com.ctre.phoenix6.CANBus;

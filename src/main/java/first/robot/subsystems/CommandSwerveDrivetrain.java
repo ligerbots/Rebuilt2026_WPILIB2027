@@ -5,6 +5,7 @@ import static org.wpilib.units.Units.Volts;
 
 import java.util.function.Supplier;
 
+import org.jcp.xml.dsig.internal.dom.Utils;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Subsystem;
@@ -19,12 +20,11 @@ import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.util.Units;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Notifier;
 import org.wpilib.system.RobotController;
+import org.wpilib.telemetry.Telemetry;
 
 import com.ctre.phoenix6.SignalLogger;
-import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;

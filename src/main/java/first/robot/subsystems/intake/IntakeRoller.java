@@ -8,6 +8,10 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -18,9 +22,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import first.robot.Constants;
 
 public class IntakeRoller extends SubsystemBase {

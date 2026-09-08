@@ -14,7 +14,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.units.measure.Current;
 
 import com.ctre.phoenix6.CANBus;

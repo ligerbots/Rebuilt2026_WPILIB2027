@@ -6,10 +6,11 @@ package first.robot.commands;
 
 import java.util.function.Supplier;
 
+import org.wpilib.command2.Command;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
+import org.wpilib.telemetry.Telemetry;
+
 import first.robot.FieldConstants;
 import first.robot.subsystems.shooter.Turret;
 
@@ -23,8 +24,6 @@ public class TMP_turretAngleTest extends Command {
     // Use addRequirements() here to declare subsystem dependencies.
     m_robotPose = robotPose;
     m_Turret = turret;
-
-    SmartDashboard.getBoolean("TurretAngleTest", false);
   }
 
   // Called when the command is initially scheduled.
@@ -34,7 +33,8 @@ public class TMP_turretAngleTest extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Rotation2d rotationGoal = Turret.getTranslationToGoal(m_robotPose.get(),  FieldConstants.flipTranslation(FieldConstants.HUB_POSITION_BLUE)).getAngle();
+    Rotation2d rotationGoal = Turret.getTranslationToGoal(m_robotPose.get(),
+        FieldConstants.flipTranslation(FieldConstants.HUB_POSITION_BLUE)).getAngle().get();
     Telemetry.log("TurretAngleTest", true);
     Telemetry.log("turretTesting/ComputedAngle", rotationGoal.getDegrees());
     m_Turret.setAngle(rotationGoal);

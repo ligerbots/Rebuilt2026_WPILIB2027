@@ -4,9 +4,10 @@
 
 package first.robot.subsystems.shooter;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.telemetry.Telemetry;
+
 import first.robot.utilities.ShooterLookupTable;
 import first.robot.utilities.ShooterLookupTable.ShootValue;
 

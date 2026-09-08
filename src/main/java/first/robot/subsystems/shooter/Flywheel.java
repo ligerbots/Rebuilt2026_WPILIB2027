@@ -12,8 +12,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 import org.wpilib.command2.SubsystemBase;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.units.measure.Current;
 
 import com.ctre.phoenix6.CANBus;
