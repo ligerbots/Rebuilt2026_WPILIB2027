@@ -19,9 +19,11 @@ import org.wpilib.command2.ParallelCommandGroup;
 import org.wpilib.command2.StartEndCommand;
 import org.wpilib.command2.button.CommandJoystick;
 import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.InternalButton;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
@@ -72,7 +74,7 @@ public class RobotContainerCompBot extends RobotContainer {
     private AutoCommandInterface m_autoCommand;
     private AutoVisualizer m_autoVisualizer = null;
 
-    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
+    private final CommandXboxController m_driverController = new CommandXboxController(0);
     private final CommandJoystick m_farm = new CommandJoystick(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
@@ -107,7 +109,7 @@ public class RobotContainerCompBot extends RobotContainer {
     
     public RobotContainerCompBot() {
         if (Robot.isSimulation()) {
-            DriverStationBackend.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionAlert(true);
         }
         
         m_drivetrain = new CommandSwerveDrivetrain(
@@ -295,6 +297,9 @@ public class RobotContainerCompBot extends RobotContainer {
             new InstantCommand(() -> m_intake.getPivot().setBrakeMode(true)).ignoringDisable(true)
         );
 
+        // 2027 code supports deadband directly in the controller
+        setDeadband(m_driverController.getController(), JOYSTICK_DEADBAND);
+
         // Just shoot
         m_driverController.rightTrigger().whileTrue(getShootCommand());
 
@@ -471,8 +476,21 @@ public class RobotContainerCompBot extends RobotContainer {
                 );
     }
 
+    private void setDeadband(XboxController controller, double deadband) 
+    {
+        controller.setLeftXDeadband(deadband);
+        controller.setLeftYDeadband(deadband);
+
+        controller.setRightXDeadband(deadband);
+        controller.setRightYDeadband(deadband);
+
+        controller.setLeftTriggerDeadband(deadband);
+        controller.setRightTriggerDeadband(deadband);
+    }
+
     private double conditionAxis(double value, SlewRateLimiter limiter) {
-        value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
+        // deadband applied in controller
+        // value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
         // Square the axis, retaining the sign
         double squared = Math.abs(value) * value;
         return limiter.calculate(squared);

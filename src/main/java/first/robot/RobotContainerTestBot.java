@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Objects;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.Telemetry;
 import org.wpilib.tunable.Selectable;
 import org.wpilib.tunable.Tunables;
@@ -53,7 +53,7 @@ public class RobotContainerTestBot extends RobotContainer {
     private AutoCommandInterface m_autoCommand;
     private AutoVisualizer m_autoVisualizer = null;
 
-    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
+    private final CommandXboxController m_driverController = new CommandXboxController(0);
     // private final CommandJoystick m_farm = new CommandJoystick(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
@@ -64,7 +64,7 @@ public class RobotContainerTestBot extends RobotContainer {
     
     public RobotContainerTestBot() {
         if (Robot.isSimulation()) {
-            DriverStationBackend.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionAlert(true);
         }
         
         m_drivetrain = new CommandSwerveDrivetrain(
@@ -96,6 +96,9 @@ public class RobotContainerTestBot extends RobotContainer {
         RobotModeTriggers.disabled().whileTrue(
             m_drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
+
+        // 2027 code supports deadband directly in the controller
+        setDeadband(m_driverController.getController(), JOYSTICK_DEADBAND);
 
         // lock wheels
         m_driverController.a().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
@@ -175,8 +178,20 @@ public class RobotContainerTestBot extends RobotContainer {
             );
     }
 
+    private void setDeadband(XboxController controller, double deadband) 
+    {
+        controller.setLeftXDeadband(deadband);
+        controller.setLeftYDeadband(deadband);
+
+        controller.setRightXDeadband(deadband);
+        controller.setRightYDeadband(deadband);
+
+        controller.setLeftTriggerDeadband(deadband);
+        controller.setRightTriggerDeadband(deadband);
+    }
+
     private double conditionAxis(double value) {
-        value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
+        // value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
         // Square the axis, retaining the sign
         return Math.abs(value) * value;
     }
