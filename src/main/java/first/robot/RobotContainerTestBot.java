@@ -19,8 +19,9 @@ import org.wpilib.driverstation.MatchState;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.util.MathUtil;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -58,7 +59,7 @@ public class RobotContainerTestBot extends RobotContainer {
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AprilTagVision m_aprilTagVision = new AprilTagVision(Robot.RobotType.TESTBOT, m_logger.getField2d());
 
-    private final SendableChooser<String> m_chosenFieldSide = new SendableChooser<>();
+    private final Selectable<String> m_chosenFieldSide = new Selectable<>();
     private int m_autoSelectionCode = Integer.MIN_VALUE; 
     
     public RobotContainerTestBot() {
@@ -80,10 +81,10 @@ public class RobotContainerTestBot extends RobotContainer {
     }
 
     private void configureAutos() {
-        m_chosenFieldSide.setDefaultOption("Depot Side", "Depot Side");
-        m_chosenFieldSide.addOption("Outpost Side", "Outpost Side");
+        m_chosenFieldSide.addDefault("Depot Side", "Depot Side");
+        m_chosenFieldSide.add("Outpost Side", "Outpost Side");
 
-        SmartDashboard.putData("Field Side", m_chosenFieldSide);
+        Tunables.publish("Field Side", m_chosenFieldSide);
     }
 
     private void configureBindings() {
