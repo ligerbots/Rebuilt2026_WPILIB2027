@@ -28,6 +28,8 @@ import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -88,8 +90,8 @@ public class RobotContainerCompBot extends RobotContainer {
     @SuppressWarnings("unused")
     private final DataLogger m_dataLogger = new DataLogger();
 
-    private final SendableChooser<String> m_chosenFieldSide = new SendableChooser<>();
-    private final SendableChooser<String> m_chosenAutoPaths = new SendableChooser<>();
+    private final Selectable<String> m_chosenFieldSide = new Selectable<>();
+    private final Selectable<String> m_chosenAutoPaths = new Selectable<>();
     private final Map<String, List<Object>> m_autoPathOptions = new LinkedHashMap<>();
     private int m_autoSelectionCode = Integer.MIN_VALUE; 
 
@@ -250,11 +252,11 @@ public class RobotContainerCompBot extends RobotContainer {
                 "Swipe Shoot Alt"
                 ));
 
-        SmartDashboard.putData("Auto Choice", m_chosenAutoPaths);
+        Tunables.publish("Auto Choice", m_chosenAutoPaths);
 
-        m_chosenFieldSide.setDefaultOption("Depot Side", "Depot Side");
-        m_chosenFieldSide.addOption("Outpost Side", "Outpost Side");
-        SmartDashboard.putData("Field Side", m_chosenFieldSide);
+        m_chosenFieldSide.addDefault("Depot Side", "Depot Side");
+        m_chosenFieldSide.add("Outpost Side", "Outpost Side");
+        Tunables.publish("Field Side", m_chosenFieldSide);
 
         Telemetry.log("autoStatus/runningIntake", false);
         Telemetry.log("autoStatus/runningShooter", false);
@@ -500,9 +502,9 @@ public class RobotContainerCompBot extends RobotContainer {
     private void addAutoOption(String name, List<Object> pathSteps, boolean isDefault) {
         m_autoPathOptions.put(name, pathSteps);
         if (isDefault) {
-            m_chosenAutoPaths.setDefaultOption(name, name);
+            m_chosenAutoPaths.addDefault(name, name);
         } else {
-            m_chosenAutoPaths.addOption(name, name);
+            m_chosenAutoPaths.add(name, name);
         }
     }
 }
