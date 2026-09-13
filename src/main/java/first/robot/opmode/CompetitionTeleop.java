@@ -48,7 +48,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
     }
 
     // The binding configuration is broken into a couple of routines so that
-    // different pieces
+    // different pieces can be overridden
     void driveBindings() {
         // for convenience here, since they are used so frequently below
         CommandNiDsXboxController driverController = m_robot.getDriverController();
