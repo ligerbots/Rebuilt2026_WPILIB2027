@@ -42,18 +42,18 @@ public class Robot extends OpModeRobot {
 
     private final Field2d m_field2d = new Field2d();
 
-    public final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED, m_field2d);
+    private final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED, m_field2d);
 
-    public final CommandNiDsXboxController driverController = new CommandNiDsXboxController(0);
-    public final CommandJoystick farm = new CommandJoystick(1);
+    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
+    private final CommandJoystick m_farm = new CommandJoystick(1);
 
-    public final CommandSwerveDrivetrain drivetrain;
-    public final AprilTagVision aprilTagVision;
-    public final ShooterFeeder shooterFeeder = new ShooterFeeder();
-    public final Shooter shooter = new Shooter();
-    public final Turret turret = new Turret(m_field2d);
-    public final Intake intake = new Intake();
-    public final Hopper hopper;
+    private final CommandSwerveDrivetrain m_drivetrain;
+    private final AprilTagVision m_aprilTagVision;
+    private final ShooterFeeder m_shooterFeeder = new ShooterFeeder();
+    private final Shooter m_shooter = new Shooter();
+    private final Turret m_turret = new Turret(m_field2d);
+    private final Intake m_intake = new Intake();
+    private final Hopper m_hopper;
 
     
     // not used directly, but the periodic() method logs data
@@ -90,26 +90,26 @@ public class Robot extends OpModeRobot {
         // Create the subsystems (aka Mechanisms)
         // If there are differences between robots, create the correct version here
 
-        aprilTagVision = new AprilTagVision(m_robotType, m_field2d);
+        m_aprilTagVision = new AprilTagVision(m_robotType, m_field2d);
 
         if (m_robotType == RobotType.TESTBOT) {
-            drivetrain = new CommandSwerveDrivetrain(
-                    aprilTagVision,
+            m_drivetrain = new CommandSwerveDrivetrain(
+                    m_aprilTagVision,
                     TunerConstantsTestBot.DrivetrainConstants,
                     TunerConstantsTestBot.FrontLeft, TunerConstantsTestBot.FrontRight, TunerConstantsTestBot.BackLeft,
                     TunerConstantsTestBot.BackRight);
         } else {
-            drivetrain = new CommandSwerveDrivetrain(
-                    aprilTagVision,
+            m_drivetrain = new CommandSwerveDrivetrain(
+                    m_aprilTagVision,
                     TunerConstantsCompBot.DrivetrainConstants,
                     TunerConstantsCompBot.FrontLeft, TunerConstantsCompBot.FrontRight, TunerConstantsCompBot.BackLeft,
                     TunerConstantsCompBot.BackRight);
         }
 
-        hopper = new Hopper(drivetrain::getRobotCentricVelocity); 
+        m_hopper = new Hopper(m_drivetrain::getRobotCentricVelocity); 
 
-        drivetrain.setupPathPlanner();
-        drivetrain.registerTelemetry(m_swerveLogger::telemeterize);
+        m_drivetrain.setupPathPlanner();
+        m_drivetrain.registerTelemetry(m_swerveLogger::telemeterize);
     }
 
     private void determineRobotType() {
@@ -135,6 +135,50 @@ public class Robot extends OpModeRobot {
 
     public Field2d getField2d() {
         return m_field2d;
+    }
+
+    public Telemetry getSwerveLogger() {
+        return m_swerveLogger;
+    }
+
+    public CommandNiDsXboxController getDriverController() {
+        return m_driverController;
+    }
+
+    public CommandJoystick getFarmController() {
+        return m_farm;
+    }
+
+    public CommandSwerveDrivetrain getDrivetrain() {
+        return m_drivetrain;
+    }
+
+    public AprilTagVision getAprilTagVision() {
+        return m_aprilTagVision;
+    }
+
+    public ShooterFeeder getShooterFeeder() {
+        return m_shooterFeeder;
+    }
+
+    public Shooter getShooter() {
+        return m_shooter;
+    }
+
+    public Turret getTurret() {
+        return m_turret;
+    }
+
+    public Intake getIntake() {
+        return m_intake;
+    }
+
+    public Hopper getHopper() {
+        return m_hopper;
+    }
+
+    public DataLogger getDataLogger() {
+        return m_dataLogger;
     }
 
     // @Override
@@ -163,18 +207,17 @@ public class Robot extends OpModeRobot {
 
     // Uses most of the Subsystems, and needed in Teleop and Auto
     public Command shootCommand(Shooter.ShotType shotType) {
-        return new Shoot(shooter, turret, shooterFeeder, drivetrain::getPose, drivetrain::getFieldCentricVelocity, shotType)
-                .alongWith(new PulseHopper(hopper, shooter, turret));
+        return new Shoot(m_shooter, m_turret, m_shooterFeeder, m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, shotType)
+                .alongWith(new PulseHopper(m_hopper, m_shooter, m_turret));
 
         // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
     }
     public Command shootCommand(double shotDistanceInches, Rotation2d turretHeading) {
-        return new Shoot(shooter, turret, shooterFeeder, drivetrain::getPose, drivetrain::getFieldCentricVelocity, shotDistanceInches, turretHeading)
-                .alongWith(new PulseHopper(hopper, shooter, turret));
+        return new Shoot(m_shooter, m_turret, m_shooterFeeder, m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, shotDistanceInches, turretHeading)
+                .alongWith(new PulseHopper(m_hopper, m_shooter, m_turret));
 
         // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
     }
-
 
     // @Override
     // public void autonomousInit() {
