@@ -6,15 +6,16 @@ package first.robot.subsystems;
 
 // import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.framework.RobotBase;
-import org.wpilib.system.RobotController;
 import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.system.RobotController;
+
 import first.robot.utilities.HubShiftUtil;
 
-public class DataLogger extends SubsystemBase {
+public class DataLogger extends PeriodicMechanism {
     // private final PowerDistribution m_powerDist = new PowerDistribution();
 
     public DataLogger() {
+        super();
     }
 
     @Override

@@ -6,11 +6,12 @@ package first.robot.subsystems.shooter;
 
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
+
+import first.robot.subsystems.PeriodicMechanism;
 import first.robot.utilities.ShooterLookupTable;
 import first.robot.utilities.ShooterLookupTable.ShootValue;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends PeriodicMechanism {
     public enum ShotType {
         HUB,
         PASS,
@@ -54,6 +55,8 @@ public class Shooter extends SubsystemBase {
     * @param shuttleLookupTableFileName the file name for the lookup table for shuttle shooting calculations
     */
     public Shooter() {
+        super();
+        
         m_hubShotLookupTable = new ShooterLookupTable(HUB_LOOKUP_TABLE_FILE);
         m_passShotLookupTable = new ShooterLookupTable(PASS_LOOKUP_TABLE_FILE);
         m_oppositeZoneShotLookupTable = new ShooterLookupTable(OPPOSITE_ZONE_LOOKUP_TABLE_FILE);

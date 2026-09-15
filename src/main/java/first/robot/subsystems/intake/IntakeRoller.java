@@ -8,6 +8,9 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -18,12 +21,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 
-public class IntakeRoller extends SubsystemBase {
+public class IntakeRoller extends PeriodicMechanism {
     private static final Current SUPPLY_CURRENT_LIMIT = Amps.of(40);
     private static final Current STATOR_CURRENT_LIMIT = Amps.of(80);
     
@@ -51,8 +52,10 @@ public class IntakeRoller extends SubsystemBase {
 
     private double m_goalRPM;
 
-    // Creates a new IntakeRollerZA
+    // Creates a new IntakeRoller
     public IntakeRoller() {
+        super();
+
         m_motor = new TalonFX(Constants.INTAKE_ROLLER_CAN_ID, new CANBus());
         
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();

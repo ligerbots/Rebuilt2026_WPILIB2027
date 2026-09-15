@@ -4,23 +4,23 @@
 
 package first.robot.subsystems.climber;
 
-import org.wpilib.command2.SubsystemBase;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.Slot1Configs;
+import org.wpilib.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-
-import org.wpilib.smartdashboard.SmartDashboard;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 
-public class ChainClimber extends SubsystemBase {
+public class ChainClimber extends PeriodicMechanism {
 
     private final TalonFX m_motor;
     private final TalonFX m_follower;
@@ -61,6 +61,7 @@ public class ChainClimber extends SubsystemBase {
 
     // Creates a new ChainClimber
     public ChainClimber() {
+        super();
 
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
 

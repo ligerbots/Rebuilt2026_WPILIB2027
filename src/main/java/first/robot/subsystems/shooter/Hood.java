@@ -6,7 +6,6 @@ package first.robot.subsystems.shooter;
 
 import static org.wpilib.units.Units.Amps;
 
-import org.wpilib.command2.SubsystemBase;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.units.measure.Current;
@@ -20,8 +19,9 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 
-public class Hood extends SubsystemBase {
+public class Hood extends PeriodicMechanism {
     private static final double ANGLE_TOLERANCE_DEG = 2.0;
 
     private static final double MIN_ANGLE_DEG = 0.0;
@@ -48,6 +48,8 @@ public class Hood extends SubsystemBase {
     
     /** Creates a new Hood. */
     public Hood() {
+        super();
+        
         m_motor = new TalonFX(Constants.HOOD_CAN_ID, new CANBus());
         
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();        

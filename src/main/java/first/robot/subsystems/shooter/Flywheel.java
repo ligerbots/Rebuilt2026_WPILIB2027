@@ -11,7 +11,6 @@ import static org.wpilib.units.Units.Amps;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.wpilib.command2.SubsystemBase;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Timer;
 import org.wpilib.units.measure.Current;
@@ -29,8 +28,9 @@ import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 
-public class Flywheel extends SubsystemBase {
+public class Flywheel extends PeriodicMechanism {
     private static final double SPEED_TOLERANCE_RPM = 175.0;
     private static final double JAM_MIN_GOAL_RPM = 250.0;
     private static final double JAM_SPINUP_GRACE_SEC = 0.05;
@@ -65,6 +65,8 @@ public class Flywheel extends SubsystemBase {
     
     // Creates a new FlyWheel
     public Flywheel() {
+        super();
+        
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();  
         
         m_motor = new TalonFX(Constants.FLYWHEEL_CAN_ID, new CANBus());

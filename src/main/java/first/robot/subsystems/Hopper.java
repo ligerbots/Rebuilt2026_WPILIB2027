@@ -10,7 +10,6 @@ import static org.wpilib.units.Units.Amps;
 
 import java.util.function.Supplier;
 
-import org.wpilib.command2.SubsystemBase;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.units.measure.Current;
@@ -26,7 +25,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import first.robot.Constants;
 
-public class Hopper extends SubsystemBase {
+public class Hopper extends PeriodicMechanism {
     
     private static final Current SUPPLY_CURRENT_LIMIT = Amps.of(30);
     private static final Current STATOR_CURRENT_LIMIT =  Amps.of(50);
@@ -51,6 +50,8 @@ public class Hopper extends SubsystemBase {
 
     // Creates a new Hopper
     public Hopper(Supplier<ChassisVelocities> robotRelativeSpeedsSupplier) {
+        super();
+        
         m_robotRelativeSpeedsSupplier = robotRelativeSpeedsSupplier;
         m_motor = new TalonFX(Constants.HOPPER_TRANSFER_CAN_ID, new CANBus());
 

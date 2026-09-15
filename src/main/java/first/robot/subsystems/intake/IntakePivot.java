@@ -6,6 +6,14 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.WaitCommand;
+import org.wpilib.command2.WaitUntilCommand;
+import org.wpilib.command3.Command;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -17,17 +25,10 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.command2.WaitCommand;
-import org.wpilib.command2.WaitUntilCommand;
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 
-public class IntakePivot extends SubsystemBase {
+public class IntakePivot extends PeriodicMechanism {
     private static final Current SUPPLY_CURRENT_LIMIT = Amps.of(20);
     private static final Current STATOR_CURRENT_LIMIT = Amps.of(40);
     
@@ -68,6 +69,8 @@ public class IntakePivot extends SubsystemBase {
 
     /** Creates a new IntakePivot. */
     public IntakePivot() {
+        super();
+
         m_motor = new TalonFX(Constants.INTAKE_DEPLOY_ID, new CANBus());
         
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();

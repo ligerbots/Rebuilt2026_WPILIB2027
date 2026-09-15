@@ -6,7 +6,6 @@ package first.robot.subsystems.shooter;
 
 import static org.wpilib.units.Units.Amps;
 
-import org.wpilib.command2.SubsystemBase;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
@@ -29,9 +28,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 import first.robot.utilities.ChineseRemainder;
 
-public class Turret extends SubsystemBase {
+public class Turret extends PeriodicMechanism {
     // public for the Shoot command - not the greatest, but a pain otherwise
     public static final Translation2d TURRET_OFFSET = new Translation2d(Units.inchesToMeters(-2.5626),  Units.inchesToMeters(-4.875));
     private static final double TURRET_HEADING_OFFSET_DEG = 180.0;
@@ -90,6 +90,8 @@ public class Turret extends SubsystemBase {
 
     /** Creates a new Turret. */
     public Turret(Field2d field) {
+        super();
+        
         // Field is used for plotting the heading
         m_field = field;
 

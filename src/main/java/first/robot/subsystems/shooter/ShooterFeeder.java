@@ -6,6 +6,8 @@
 
 package first.robot.subsystems.shooter;
 
+import org.wpilib.smartdashboard.SmartDashboard;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -16,11 +18,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import first.robot.Constants;
+import first.robot.subsystems.PeriodicMechanism;
 
-public class ShooterFeeder extends SubsystemBase {
+public class ShooterFeeder extends PeriodicMechanism {
     
     private static final double KICKER_K_P = 0.6;
     private static final double KICKER_K_I = 0.0; 
@@ -55,6 +56,8 @@ public class ShooterFeeder extends SubsystemBase {
 
     // Creates a new ShooterFeeder
     public ShooterFeeder() {
+        super();
+        
         m_motorKicker = new TalonFX(Constants.SHOOTER_KICKER_CAN_ID, new CANBus());
         m_motorFeeder = new TalonFX(Constants.SHOOTER_FEEDER_BELTS_CAN_ID, new CANBus());
 
