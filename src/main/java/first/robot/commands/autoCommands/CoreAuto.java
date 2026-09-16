@@ -2,10 +2,8 @@ package first.robot.commands.autoCommands;
 
 import java.util.List;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.WaitCommand;
-import org.wpilib.command2.button.InternalButton;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.button.InternalButton;
 import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.smartdashboard.SmartDashboard;

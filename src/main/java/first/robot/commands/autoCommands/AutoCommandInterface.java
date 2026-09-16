@@ -5,9 +5,9 @@
 package first.robot.commands.autoCommands;
 
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.command2.SequentialCommandGroup;
+import org.wpilib.command3.Command;
 
-public abstract class AutoCommandInterface extends SequentialCommandGroup {
-    
+public abstract class AutoCommandInterface implements Command {
+
     public abstract Pose2d getInitialPose();
 }

@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.wpilib.command2.CommandScheduler;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.button.InternalButton;
+import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.button.InternalButton;
 import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.opmode.Autonomous;
@@ -22,6 +21,7 @@ import org.wpilib.smartdashboard.SmartDashboard;
 import com.pathplanner.lib.events.EventTrigger;
 
 import first.robot.Robot;
+import first.robot.commands.LigerCommandsV3;
 import first.robot.commands.autoCommands.AutoCommandInterface;
 import first.robot.commands.autoCommands.CoreAuto;
 import first.robot.subsystems.CommandSwerveDrivetrain;
@@ -65,7 +65,7 @@ public class CompetitionAuto extends PeriodicOpMode {
 
         // schedule the Auto command
         if (m_autoCommand != null)
-            CommandScheduler.getInstance().schedule(m_autoCommand);
+            Scheduler.getDefault().schedule(m_autoCommand);
     }
 
     /**
@@ -77,7 +77,7 @@ public class CompetitionAuto extends PeriodicOpMode {
     public  void end() {
         // not sure this is actually needed?
         if (m_autoCommand != null) {
-            CommandScheduler.getInstance().cancel(m_autoCommand);
+            Scheduler.getDefault().cancel(m_autoCommand);
         }      
         
         if (m_autoVisualizer != null) 
@@ -231,11 +231,19 @@ public class CompetitionAuto extends PeriodicOpMode {
     }
 
     private void configureAutoEventTriggers() {
-        new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", true))));
-        new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", false))));
+        new EventTrigger("Run Intake")
+                .onTrue(m_robot.getIntake().deployAndRollCommand()
+                        .alongWith(LigerCommandsV3.InstantCommand("setStatus",
+                                () -> SmartDashboard.putBoolean("autoStatus/runningIntake", true)))
+                        .withAutomaticName());
+        new EventTrigger("Stop Intake")
+                .onTrue(m_robot.getIntake().stowCommand()
+                        .alongWith(LigerCommandsV3.InstantCommand("setStatus",
+                                () -> SmartDashboard.putBoolean("autoStatus/runningIntake", false)))
+                        .withAutomaticName());
 
         new EventTrigger("Shooter Running").whileTrue(m_robot.shootCommand(ShotType.AUTO));
-        new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", false)));
+        new EventTrigger("Shooter Running").onFalse(LigerCommandsV3.InstantCommand("statusOff", () -> SmartDashboard.putBoolean("autoStatus/runningShooter", false)));
 
      }
 
