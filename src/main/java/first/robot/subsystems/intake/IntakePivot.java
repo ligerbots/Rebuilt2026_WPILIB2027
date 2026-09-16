@@ -5,10 +5,8 @@
 package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
+import static org.wpilib.units.Units.Seconds;
 
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.WaitCommand;
-import org.wpilib.command2.WaitUntilCommand;
 import org.wpilib.command3.Command;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.smartdashboard.SmartDashboard;
@@ -171,24 +169,39 @@ public class IntakePivot extends PeriodicMechanism {
             m_motor.configNeutralMode(NeutralModeValue.Coast);
     }
 
+    public Command setAngleCommand(Rotation2d angle) {
+        return run(
+            coroutine -> { setAngle(angle); }
+        ).named("setAngle");
+    }
+
+    public Command holdAngleCommand(Rotation2d angle) {
+        return run(
+            coroutine -> { holdAngle(angle); }
+        ).named("holdAngle");
+    }
+
     // Note: stowCommand is in Intake, since it also involves the Rollers
     
-    public Command runPulseCommand() {
-        // This can be killed, since WaitCommand always finishes.
-        return new InstantCommand(() -> setAngle(PULSE_POSITION), this)
-            .andThen(new WaitCommand(0.5))
-            .andThen(new InstantCommand(() -> setAngle(STOW_POSITION), this))
-            .andThen(new WaitCommand(0.5))
-            .repeatedly();
+    public Command runPulseCommand3() {
+        return run(
+                coroutine -> {
+                    while (true) {
+                        setAngle(PULSE_POSITION);
+                        coroutine.wait(Seconds.of(0.5));
+                        setAngle(STOW_POSITION);
+                        coroutine.wait(Seconds.of(0.5));
+                    }
+                }).named("PulseIntake");
     }
-    
+
     public Command deployCommand() {
-        Command cmd = new InstantCommand(() -> setAngle(DEPLOY_POSITION))
-                .andThen(new WaitUntilCommand(this::onTarget))
-                .andThen(new InstantCommand(this::stop));
-        // Add a requirement on the entire command (including WaitUntilCommand, we hope).
-        // Then, if it gets stuck in WaitUntilCommand, another Pivot command will still kill it.
-        cmd.addRequirements(this);
-        return cmd;
+        return run(
+            coroutine -> {
+                setAngle(DEPLOY_POSITION);
+                coroutine.waitUntil(this::onTarget);
+                stop();
+            }
+        ).named("DeployIntake");
     }
 }

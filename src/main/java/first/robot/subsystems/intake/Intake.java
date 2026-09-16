@@ -4,17 +4,15 @@
 
 package first.robot.subsystems.intake;
 
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.StartEndCommand;
-import org.wpilib.command2.WaitUntilCommand;
+import static org.wpilib.units.Units.Seconds;
 import org.wpilib.command3.Command;
 
 import first.robot.subsystems.PeriodicMechanism;
 
 public class Intake extends PeriodicMechanism {
     
-    IntakePivot m_intakePivot;
-    IntakeRoller m_intakeRoller;
+    final IntakePivot m_intakePivot;
+    final IntakeRoller m_intakeRoller;
     
     /** Creates a new Intake. */
     public Intake() {
@@ -23,24 +21,38 @@ public class Intake extends PeriodicMechanism {
         m_intakePivot = new IntakePivot();
         m_intakeRoller = new IntakeRoller();
     }
-    
+
+    public IntakeRoller getRoller() {
+        return m_intakeRoller;
+    }
+
+    public IntakePivot getPivot() {
+        return m_intakePivot;
+    }
+
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
     }
     
     public Command stowCommand() {
-        Command cmd = new InstantCommand(() -> m_intakeRoller.intake())
-        .andThen(new InstantCommand(() -> m_intakePivot.setAngle(IntakePivot.STOW_POSITION)))
-        .andThen(new WaitUntilCommand(m_intakePivot::onTarget)).withTimeout(1)
-        .andThen(new InstantCommand(() -> m_intakePivot.holdAngle(IntakePivot.STOW_POSITION)))
-        .andThen(new InstantCommand(m_intakeRoller::stop));
-        cmd.addRequirements(m_intakePivot, m_intakeRoller);
-        return cmd;
+        Command waitCmd = Command.requiring(m_intakePivot, m_intakeRoller)
+                .executing(
+                        coroutine -> {
+                            coroutine.waitUntil(m_intakePivot::onTarget);
+                        })
+                .named("foo").withTimeout(Seconds.of(1));
+
+        return Command.sequence(
+            m_intakeRoller.runRollers(),
+            m_intakePivot.setAngleCommand(IntakePivot.STOW_POSITION),
+            waitCmd,
+            m_intakePivot.holdAngleCommand(IntakePivot.STOW_POSITION),
+            m_intakeRoller.stopRollers()).withAutomaticName();
     }
     
     public Command deployAndRollCommand() {
-        return m_intakePivot.deployCommand().alongWith(this.runFastRollers());
+        return m_intakePivot.deployCommand().alongWith(runFastRollers()).withAutomaticName();
     }
     
     public Command deployCommand() {
@@ -48,28 +60,18 @@ public class Intake extends PeriodicMechanism {
     }
     
     public Command runRollers() {
-        return new InstantCommand(m_intakeRoller::intake, m_intakeRoller);
+        return m_intakeRoller.runRollers();
     }
     
     public Command runFastRollers() {
-        return new InstantCommand(m_intakeRoller::fastIntake, m_intakeRoller);
+        return m_intakeRoller.runFastRollers();
     }
     
     public Command stopRollers() {
-        return new InstantCommand(m_intakeRoller::stop, m_intakeRoller);
+        return m_intakeRoller.stopRollers();
     }
-    
+
     public Command outtakeCommand() {
-        return m_intakePivot.deployCommand().alongWith(
-            new StartEndCommand(m_intakeRoller::outtake, m_intakeRoller::stop, m_intakeRoller));
-        }
-        
-        public IntakeRoller getRoller() {
-            return m_intakeRoller;
-        }
-        
-        public IntakePivot getPivot() {
-            return m_intakePivot;
-        }
+        return m_intakePivot.deployCommand().alongWith(m_intakeRoller.outtakeThenStop()).withAutomaticName();
     }
-    
+}

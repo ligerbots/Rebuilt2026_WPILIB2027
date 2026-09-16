@@ -8,6 +8,7 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command3.Command;
 import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.units.measure.Current;
 
@@ -143,5 +144,32 @@ public class IntakeRoller extends PeriodicMechanism {
     }
     public void decreaseIntakeFudge() {
         m_intakeRPMScale -= INTAKE_RPM_FUDGE;
+    }
+
+    public Command runRollers() {
+        return run(
+            coroutine -> { intake(); }
+        ).named("intake");
+    }
+    
+    public Command runFastRollers() {
+        return run(
+            coroutine -> { fastIntake(); }
+        ).named("fastIntake");
+    }
+    
+    public Command stopRollers() {
+        return run(
+            coroutine -> { stop(); }
+        ).named("stopIntake");
+    }
+
+    public Command outtakeThenStop() {
+        return run(
+            coroutine -> { 
+                outtake();
+                coroutine.park(); // wait until canceled
+                }
+        ).whenCanceled(this::stop).named("outtake");
     }
 }
