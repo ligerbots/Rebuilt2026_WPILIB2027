@@ -4,20 +4,15 @@
 
 package first.robot.opmode;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.ParallelCommandGroup;
-import org.wpilib.command2.StartEndCommand;
-import org.wpilib.command2.button.CommandGenericHID;
-import org.wpilib.command2.button.CommandNiDsXboxController;
-import org.wpilib.command2.button.RobotModeTriggers;
+import org.wpilib.command3.button.CommandJoystick;
+import org.wpilib.command3.button.CommandNiDsXboxController;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import first.robot.Robot;
 import first.robot.subsystems.CommandSwerveDrivetrain;
@@ -70,7 +65,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
     void mainBindings() {
         // for convenience here, since they are used so frequently below
         CommandNiDsXboxController driverController = m_robot.getDriverController();
-        CommandGenericHID farmController = m_robot.getFarmController();
+        CommandJoystick farmController = m_robot.getFarmController();
         Intake intake = m_robot.getIntake();
         Shooter shooter = m_robot.getShooter();
         

@@ -4,12 +4,14 @@
 
 package first.robot;
 
-import static org.wpilib.units.Units.*;
+import static org.wpilib.units.Units.MetersPerSecond;
+import static org.wpilib.units.Units.RadiansPerSecond;
+import static org.wpilib.units.Units.RotationsPerSecond;
 
-import org.wpilib.command2.Command;
-import org.wpilib.command2.CommandScheduler;
-import org.wpilib.command2.button.CommandJoystick;
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command3.Command;
+import org.wpilib.command3.Scheduler;
+import org.wpilib.command3.button.CommandJoystick;
+import org.wpilib.command3.button.CommandNiDsXboxController;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.OpModeRobot;
@@ -181,23 +183,10 @@ public class Robot extends OpModeRobot {
         return m_dataLogger;
     }
 
-    // @Override
-    // public void driverStationConnected() {
-    // }
-
-    // /**
-    //  * This function is called periodically anytime when no opmode is selected,
-    //  * including when the
-    //  * Driver Station is disconnected.
-    //  */
-    // @Override
-    // public void nonePeriodic() {
-    // }
-
     @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
-        CommandScheduler.getInstance().run(); 
+        Scheduler.getDefault().run(); 
     }
 
     @Override
@@ -218,38 +207,4 @@ public class Robot extends OpModeRobot {
 
         // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
     }
-
-    // @Override
-    // public void autonomousInit() {
-    //     // double startT = Timer.getMonotonicTimestamp();
-    //     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    //     if (m_autonomousCommand != null) {
-    //         CommandScheduler.getInstance().schedule(m_autonomousCommand);
-    //     }
-    //     // System.out.println("*** AutoInit took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
-    // }
-
-    // @Override
-    // public void autonomousPeriodic() {}
-
-    // @Override
-    // public void autonomousExit() {}
-
-    // @Override
-    // public void teleopInit() {
-    //     HubShiftUtil.initialize();
-    //     // note: use this here, or in disabledExit(), but no need for both
-    //     // m_robotContainer.clearAutoPreview();
-
-    //     if (m_autonomousCommand != null) {
-    //         CommandScheduler.getInstance().cancel(m_autonomousCommand);
-    //     }
-    // }
-
-    // @Override
-    // public void teleopPeriodic() {}
-
-    // @Override
-    // public void teleopExit() {}
 }
