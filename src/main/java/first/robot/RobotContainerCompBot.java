@@ -17,7 +17,7 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.InstantCommand;
 import org.wpilib.command2.ParallelCommandGroup;
 import org.wpilib.command2.StartEndCommand;
-import org.wpilib.command2.button.CommandJoystick;
+import org.wpilib.command2.button.CommandGenericHID;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.InternalButton;
 import org.wpilib.command2.button.RobotModeTriggers;
@@ -73,7 +73,7 @@ public class RobotContainerCompBot extends RobotContainer {
     private AutoVisualizer m_autoVisualizer = null;
 
     private final CommandXboxController m_driverController = new CommandXboxController(0);
-    private final CommandJoystick m_farm = new CommandJoystick(1);
+    private final CommandGenericHID m_farm = new CommandGenericHID(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AprilTagVision m_aprilTagVision = new AprilTagVision(Robot.RobotType.COMPBOT, m_logger.getField2d());
@@ -317,7 +317,8 @@ public class RobotContainerCompBot extends RobotContainer {
         m_driverController.leftBumper().onTrue(m_intake.stowCommand());
 
         // lock wheels
-        m_driverController.back().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
+        // ** Alpha 7 - not sure if this is the correct button **
+        m_driverController.menu().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
 
         // Unjam
         m_farm.button(21).whileTrue(UnJamCommand());
@@ -362,7 +363,8 @@ public class RobotContainerCompBot extends RobotContainer {
         m_farm.button(8).onTrue(new InstantCommand(() -> m_shooter.setPassNeutral(false)));
 
         // Reset the field-centric heading on Start press.
-        m_driverController.start().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
+        // ** Alpha 7 - not sure if this is the correct button **
+        m_driverController.view().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.

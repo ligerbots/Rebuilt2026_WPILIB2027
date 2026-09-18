@@ -54,7 +54,7 @@ public class RobotContainerTestBot extends RobotContainer {
     private AutoVisualizer m_autoVisualizer = null;
 
     private final CommandXboxController m_driverController = new CommandXboxController(0);
-    // private final CommandJoystick m_farm = new CommandJoystick(1);
+    // private final CommandGenericHID m_farm = new CommandGenericHID(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AprilTagVision m_aprilTagVision = new AprilTagVision(Robot.RobotType.TESTBOT, m_logger.getField2d());
@@ -108,10 +108,11 @@ public class RobotContainerTestBot extends RobotContainer {
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        m_driverController.back().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdDynamic(Direction.FORWARD));
-        m_driverController.back().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdDynamic(Direction.REVERSE));
-        m_driverController.start().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.FORWARD));
-        m_driverController.start().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.REVERSE));
+        // ** Alpha 7 check the correct mapping of these buttons.
+        m_driverController.menu().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdDynamic(Direction.FORWARD));
+        m_driverController.menu().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdDynamic(Direction.REVERSE));
+        m_driverController.view().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.FORWARD));
+        m_driverController.view().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.REVERSE));
 
         // Reset the field-centric heading on left bumper press.
         m_driverController.leftBumper().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
