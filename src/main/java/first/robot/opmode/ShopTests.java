@@ -68,8 +68,7 @@ public class ShopTests extends PeriodicOpMode {
                         }).named("stepTurret"));
 
         farmController.button(23).whileTrue(
-                LigerCommandsV3
-                        .InstantCommand("goto320", () -> m_robot.getTurret().setAngle(Rotation2d.fromDegrees(320.0)))
+                LigerCommandsV3.InstantCommand("goto320", () -> m_robot.getTurret().setAngle(Rotation2d.fromDegrees(320.0)))
                         .andThen(Command.waitFor(Seconds.of(0.4)).named(""))
                         .andThen(LigerCommandsV3.InstantCommand("goto280",
                                 () -> m_robot.getTurret().setAngle(Rotation2d.fromDegrees(280.0))))
