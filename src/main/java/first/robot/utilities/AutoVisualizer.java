@@ -99,7 +99,7 @@ public class AutoVisualizer {
             return Rotation2d.ZERO;
         }
 
-        return headingVector.getAngle();
+        return headingVector.getAngle().get();
     }
 
     private Pose2d getAnimatedPreviewPoseBlue() {

@@ -330,7 +330,7 @@ public class RobotContainerCompBot extends RobotContainer {
         // ladder - robot against the outside of the ladder, intake to the left for the dirver
         m_farm.button(11).whileTrue(withHopperControl(
                 new Shoot(m_shooter, m_turret, m_shooterFeeder, 
-                        m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, 130.0, Rotation2d.kCCW_90deg)));
+                        m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, 130.0, Rotation2d.CCW_90DEG)));
 
         // corner shot
         m_farm.button(13).whileTrue(withHopperControl(

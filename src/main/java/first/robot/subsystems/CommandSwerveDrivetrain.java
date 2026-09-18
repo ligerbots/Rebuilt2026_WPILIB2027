@@ -5,7 +5,6 @@ import static org.wpilib.units.Units.Volts;
 
 import java.util.function.Supplier;
 
-import org.jcp.xml.dsig.internal.dom.Utils;
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
 import org.wpilib.command2.Subsystem;
@@ -22,6 +21,7 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.util.Units;
 import org.wpilib.system.Notifier;
 import org.wpilib.system.RobotController;
+import org.wpilib.system.Timer;
 import org.wpilib.telemetry.Telemetry;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -39,6 +39,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 
 import first.robot.Constants;
 import first.robot.FieldConstants;
+import first.robot.Robot;
 import first.robot.commands.Shoot;
 import first.robot.generated.TunerConstantsTestBot.TunerSwerveDrivetrain;
 import first.robot.subsystems.shooter.Turret;
@@ -157,9 +158,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         // The default Phoenix odometry rate is more aggressive than we need for desktop sim,
         // which can cause "stale" status signal warnings from the module Talons.
-        super(drivetrainConstants, Utils.isSimulation() ? kSimOdometryFrequencyHz : 0.0, modules);
+        super(drivetrainConstants, Robot.isSimulation() ? kSimOdometryFrequencyHz : 0.0, modules);
         // setupPathPlanner();
-        if (Utils.isSimulation()) {
+        if (Robot.isSimulation()) {
             startSimThread();
         }
 
@@ -318,11 +319,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     private void startSimThread() {
-        m_lastSimTime = Utils.getCurrentTimeSeconds();
+        m_lastSimTime = Timer.getMonotonicTimestamp();
 
         /* Run simulation at a faster rate so PID gains behave more reasonably */
         m_simNotifier = new Notifier(() -> {
-            final double currentTime = Utils.getCurrentTimeSeconds();
+            final double currentTime = Timer.getMonotonicTimestamp();
             double deltaTime = currentTime - m_lastSimTime;
             m_lastSimTime = currentTime;
 
@@ -439,5 +440,4 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         return null;
     }
-
 }
