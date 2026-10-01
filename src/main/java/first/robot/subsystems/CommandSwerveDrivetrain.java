@@ -54,10 +54,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
-    private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.ZERO;
-    /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
-    private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
+    /** Blue alliance sees forward as 0 degrees (toward red alliance wall) */
+    private static final Rotation2d BLUE_ALLIANCE_FORWARD_DIRECTION = Rotation2d.ZERO;
+    /** Red alliance sees forward as 180 degrees (toward blue alliance wall) */
+    private static final Rotation2d RED_ALLIANCE_FORWARD_DIRECTION = Rotation2d.k180deg;    
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
@@ -308,10 +308,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
          */
         if (!m_hasAppliedOperatorPerspective || RobotState.isDisabled()) {
             MatchState.getAlliance().ifPresent(allianceColor -> {
-                setOperatorPerspectiveForward(
+                setOperatorForwardDirection(
                     allianceColor == Alliance.RED
-                        ? kRedAlliancePerspectiveRotation
-                        : kBlueAlliancePerspectiveRotation
+                        ? RED_ALLIANCE_FORWARD_DIRECTION
+                        : BLUE_ALLIANCE_FORWARD_DIRECTION
                 );
                 m_hasAppliedOperatorPerspective = true;
             });

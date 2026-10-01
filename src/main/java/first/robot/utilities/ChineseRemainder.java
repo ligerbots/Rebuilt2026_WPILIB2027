@@ -85,7 +85,7 @@ public class ChineseRemainder {
     */
     public static void smartDashboardLogABSOffsets(int gear1teeth, int gear2teeth, double gear1rotations, double gear2rotations) {
         // TODO: Make sure abs encoders wrap in other logic bc they may be big
-        double middleTeeth = (gear1teeth * gear2teeth) / 2;
+        double middleTeeth = (gear1teeth * gear2teeth) / 2.0;
 
         double gear1remainder = middleTeeth % gear1teeth;
         double gear1offsetToApply = gear1remainder / gear1teeth - gear1rotations;
