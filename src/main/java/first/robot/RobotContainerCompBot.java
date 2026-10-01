@@ -17,18 +17,19 @@ import org.wpilib.command2.Command;
 import org.wpilib.command2.InstantCommand;
 import org.wpilib.command2.ParallelCommandGroup;
 import org.wpilib.command2.StartEndCommand;
-import org.wpilib.command2.button.CommandJoystick;
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandGenericHID;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.InternalButton;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -46,9 +47,9 @@ import first.robot.subsystems.Hopper;
 import first.robot.subsystems.intake.Intake;
 import first.robot.subsystems.shooter.Shooter;
 import first.robot.subsystems.shooter.Shooter.ShotType;
-import first.robot.utilities.AutoVisualizer;
 import first.robot.subsystems.shooter.ShooterFeeder;
 import first.robot.subsystems.shooter.Turret;
+import first.robot.utilities.AutoVisualizer;
 
 public class RobotContainerCompBot extends RobotContainer {
 
@@ -66,13 +67,13 @@ public class RobotContainerCompBot extends RobotContainer {
     private final SwerveRequest.SwerveDriveBrake m_brakeRequest = new SwerveRequest.SwerveDriveBrake();
     // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry m_logger = new Telemetry(MAX_SPEED);
+    private final SwerveTelemetry m_logger = new SwerveTelemetry(MAX_SPEED);
 
     private AutoCommandInterface m_autoCommand;
     private AutoVisualizer m_autoVisualizer = null;
 
-    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
-    private final CommandJoystick m_farm = new CommandJoystick(1);
+    private final CommandXboxController m_driverController = new CommandXboxController(0);
+    private final CommandGenericHID m_farm = new CommandGenericHID(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AprilTagVision m_aprilTagVision = new AprilTagVision(Robot.RobotType.COMPBOT, m_logger.getField2d());
@@ -89,8 +90,8 @@ public class RobotContainerCompBot extends RobotContainer {
     @SuppressWarnings("unused")
     private final DataLogger m_dataLogger = new DataLogger();
 
-    private final SendableChooser<String> m_chosenFieldSide = new SendableChooser<>();
-    private final SendableChooser<String> m_chosenAutoPaths = new SendableChooser<>();
+    private final Selectable<String> m_chosenFieldSide = new Selectable<>();
+    private final Selectable<String> m_chosenAutoPaths = new Selectable<>();
     private final Map<String, List<Object>> m_autoPathOptions = new LinkedHashMap<>();
     private int m_autoSelectionCode = Integer.MIN_VALUE; 
 
@@ -106,7 +107,7 @@ public class RobotContainerCompBot extends RobotContainer {
     
     public RobotContainerCompBot() {
         if (Robot.isSimulation()) {
-            DriverStationBackend.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionAlert(true);
         }
         
         m_drivetrain = new CommandSwerveDrivetrain(
@@ -251,14 +252,14 @@ public class RobotContainerCompBot extends RobotContainer {
                 "Swipe Shoot Alt"
                 ));
 
-        SmartDashboard.putData("Auto Choice", m_chosenAutoPaths);
+        Tunables.publish("Auto Choice", m_chosenAutoPaths);
 
-        m_chosenFieldSide.setDefaultOption("Depot Side", "Depot Side");
-        m_chosenFieldSide.addOption("Outpost Side", "Outpost Side");
-        SmartDashboard.putData("Field Side", m_chosenFieldSide);
+        m_chosenFieldSide.addDefault("Depot Side", "Depot Side");
+        m_chosenFieldSide.add("Outpost Side", "Outpost Side");
+        Tunables.publish("Field Side", m_chosenFieldSide);
 
-        SmartDashboard.putBoolean("autoStatus/runningIntake", false);
-        SmartDashboard.putBoolean("autoStatus/runningShooter", false);
+        Telemetry.log("autoStatus/runningIntake", false);
+        Telemetry.log("autoStatus/runningShooter", false);
 
         configureAutoEventTriggers();
     }
@@ -266,15 +267,15 @@ public class RobotContainerCompBot extends RobotContainer {
     public Command getShootCommand() {
         return withHopperControl(
                 new Shoot(m_shooter, m_turret, m_shooterFeeder, m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, ShotType.AUTO));
-                        //     new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
+                        //     new InstantCommand(() -> Telemetry.log("autoStatus/runningShooter", true)));
     }
     
     private void configureAutoEventTriggers() {
-        new EventTrigger("Run Intake").onTrue(m_intake.deployAndRollCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", true))));
-        new EventTrigger("Stop Intake").onTrue(m_intake.stowCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", false))));
+        new EventTrigger("Run Intake").onTrue(m_intake.deployAndRollCommand().alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", true))));
+        new EventTrigger("Stop Intake").onTrue(m_intake.stowCommand().alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", false))));
 
         new EventTrigger("Shooter Running").whileTrue(getShootCommand());
-        new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", false)));
+        new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> Telemetry.log("autoStatus/runningShooter", false)));
 
      }
 
@@ -293,6 +294,9 @@ public class RobotContainerCompBot extends RobotContainer {
         RobotModeTriggers.disabled().onTrue(
             new InstantCommand(() -> m_intake.getPivot().setBrakeMode(true)).ignoringDisable(true)
         );
+
+        // 2027 code supports deadband directly in the controller
+        setDeadband(m_driverController.getController(), JOYSTICK_DEADBAND);
 
         // Just shoot
         m_driverController.rightTrigger().whileTrue(getShootCommand());
@@ -313,7 +317,8 @@ public class RobotContainerCompBot extends RobotContainer {
         m_driverController.leftBumper().onTrue(m_intake.stowCommand());
 
         // lock wheels
-        m_driverController.back().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
+        // ** Alpha 7 - not sure if this is the correct button **
+        m_driverController.menu().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
 
         // Unjam
         m_farm.button(21).whileTrue(UnJamCommand());
@@ -326,7 +331,7 @@ public class RobotContainerCompBot extends RobotContainer {
         // ladder - robot against the outside of the ladder, intake to the left for the dirver
         m_farm.button(11).whileTrue(withHopperControl(
                 new Shoot(m_shooter, m_turret, m_shooterFeeder, 
-                        m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, 130.0, Rotation2d.kCCW_90deg)));
+                        m_drivetrain::getPose, m_drivetrain::getFieldCentricVelocity, 130.0, Rotation2d.CCW_90DEG)));
 
         // corner shot
         m_farm.button(13).whileTrue(withHopperControl(
@@ -358,7 +363,8 @@ public class RobotContainerCompBot extends RobotContainer {
         m_farm.button(8).onTrue(new InstantCommand(() -> m_shooter.setPassNeutral(false)));
 
         // Reset the field-centric heading on Start press.
-        m_driverController.start().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
+        // ** Alpha 7 - not sure if this is the correct button **
+        m_driverController.view().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -376,19 +382,19 @@ public class RobotContainerCompBot extends RobotContainer {
 
         // m_driverController.x().onTrue(new InstantCommand(() -> m_shooter.getHood().setAngle(Rotation2d.fromDegrees(SmartDashboard.getNumber("hood/testAngle", 0.0)))));
         
-        // SmartDashboard.putNumber("flywheel/testVoltage", 0.0); 
+        // Telemetry.log("flywheel/testVoltage", 0.0); 
         // m_farm.button(22).onTrue(new InstantCommand(() -> m_shooter.getFlywheel().setVoltage(SmartDashboard.getNumber("flywheel/testVoltage", 0.0))));
 
         // m_farm.button(23).onTrue(new InstantCommand(() -> m_shooter.getFlywheel().setRPM(SmartDashboard.getNumber("flywheel/testRPM", 0.0))));
 
-        // SmartDashboard.putNumber("feeder/testVoltage", 0.0); 
+        // Telemetry.log("feeder/testVoltage", 0.0); 
         // m_farm.button(22).onTrue(new InstantCommand(() -> m_shooterFeeder.setKickerVoltage(SmartDashboard.getNumber("feeder/testVoltage", 0.0))));
 
         // m_farm.button(23).onTrue(new InstantCommand(() -> m_shooterFeeder.setKickerRPM(SmartDashboard.getNumber("kicker/testRPM", 0.0))));
 
         // m_driverController.a().onTrue(new InstantCommand(() -> m_shooterFeeder.setRPM(SmartDashboard.getNumber("shooterFeeder/testRPM", 0.0))));
 
-        // SmartDashboard.putNumber("turret/testAngle", 0.0);
+        // Telemetry.log("turret/testAngle", 0.0);
         // m_farm.button(22).onTrue(new InstantCommand(() -> m_turret.setAngle(Rotation2d.fromDegrees(SmartDashboard.getNumber("turret/testAngle", 0.0)))));
 
         // m_farm.button(23).whileTrue(
@@ -404,7 +410,7 @@ public class RobotContainerCompBot extends RobotContainer {
 
         // Command turretAngleTest = new TMP_turretAngleTest(m_drivetrain::getPose, m_turret);
         // m_driverController.start().whileTrue(turretAngleTest);
-        // SmartDashboard.putBoolean("TurretAngleTest", false);
+        // Telemetry.log("TurretAngleTest", false);
         // Trigger turretAngleTestTrigger = new Trigger(() -> SmartDashboard.getBoolean("TurretAngleTest", false));
         // turretAngleTestTrigger.whileTrue(turretAngleTest);
     }
@@ -433,7 +439,7 @@ public class RobotContainerCompBot extends RobotContainer {
             m_autoVisualizer = new AutoVisualizer(m_drivetrain.getPPRobotConfig());
             m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, m_drivetrain, isOutpostSide, m_virtualShootButton, m_autoVisualizer);
 
-            SmartDashboard.putString("Selected Auto", selectedAutoName);
+            Telemetry.log("Selected Auto", selectedAutoName);
             m_autoVisualizer.registerAndStart(m_logger.getField2d());
             // System.out.println("*** Build Auto command took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
         }
@@ -470,8 +476,21 @@ public class RobotContainerCompBot extends RobotContainer {
                 );
     }
 
+    private void setDeadband(XboxController controller, double deadband) 
+    {
+        controller.setLeftXDeadband(deadband);
+        controller.setLeftYDeadband(deadband);
+
+        controller.setRightXDeadband(deadband);
+        controller.setRightYDeadband(deadband);
+
+        controller.setLeftTriggerDeadband(deadband);
+        controller.setRightTriggerDeadband(deadband);
+    }
+
     private double conditionAxis(double value, SlewRateLimiter limiter) {
-        value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
+        // deadband applied in controller
+        // value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
         // Square the axis, retaining the sign
         double squared = Math.abs(value) * value;
         return limiter.calculate(squared);
@@ -501,9 +520,9 @@ public class RobotContainerCompBot extends RobotContainer {
     private void addAutoOption(String name, List<Object> pathSteps, boolean isDefault) {
         m_autoPathOptions.put(name, pathSteps);
         if (isDefault) {
-            m_chosenAutoPaths.setDefaultOption(name, name);
+            m_chosenAutoPaths.addDefault(name, name);
         } else {
-            m_chosenAutoPaths.addOption(name, name);
+            m_chosenAutoPaths.add(name, name);
         }
     }
 }

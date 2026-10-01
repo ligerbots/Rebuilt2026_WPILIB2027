@@ -15,11 +15,11 @@ import org.wpilib.networktables.StructPublisher;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.smartdashboard.Mechanism2d;
 import org.wpilib.smartdashboard.MechanismLigament2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.util.Color;
 import org.wpilib.util.Color8Bit;
 
-public class Telemetry {
+public class SwerveTelemetry {
     private final double MaxSpeed;
 
     /* What to publish over networktables for telemetry */
@@ -68,16 +68,16 @@ public class Telemetry {
      * 
      * @param maxSpeed Maximum speed in meters per second
      */
-    public Telemetry(double maxSpeed) {
+    public SwerveTelemetry(double maxSpeed) {
         MaxSpeed = maxSpeed;
         SignalLogger.start();
 
         /* Set up the module state Mechanism2d telemetry */
         for (int i = 0; i < 4; ++i) {
-            SmartDashboard.putData("Module " + i, m_moduleMechanisms[i]);
+            Telemetry.log("Module " + i, m_moduleMechanisms[i]);
         }
 
-        SmartDashboard.putData("Field", m_field);
+        Telemetry.log("Field", m_field);
     }
 
     public Field2d getField2d() {

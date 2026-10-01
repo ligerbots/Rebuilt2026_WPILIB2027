@@ -6,6 +6,15 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command2.Command;
+import org.wpilib.command2.InstantCommand;
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.command2.WaitCommand;
+import org.wpilib.command2.WaitUntilCommand;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -17,14 +26,6 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.Command;
-import org.wpilib.command2.InstantCommand;
-import org.wpilib.command2.SubsystemBase;
-import org.wpilib.command2.WaitCommand;
-import org.wpilib.command2.WaitUntilCommand;
 import first.robot.Constants;
 
 public class IntakePivot extends SubsystemBase {
@@ -47,7 +48,7 @@ public class IntakePivot extends SubsystemBase {
 
     private static final Rotation2d PULSE_POSITION = Rotation2d.fromDegrees(10.0);
 
-    private Rotation2d m_goal = Rotation2d.kZero;
+    private Rotation2d m_goal = Rotation2d.ZERO;
 
     private final TalonFX m_motor;
     private final MotionMagicVoltage m_positionControl = new MotionMagicVoltage(0);
@@ -114,18 +115,18 @@ public class IntakePivot extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("intake/deployAngle", getAngle().getDegrees());
-        SmartDashboard.putBoolean("intake/onTarget", onTarget());
+        Telemetry.log("intake/deployAngle", getAngle().getDegrees());
+        Telemetry.log("intake/onTarget", onTarget());
 
         // Commanded state
-        SmartDashboard.putNumber("intake/deployGoal", m_goal.getDegrees());
+        Telemetry.log("intake/deployGoal", m_goal.getDegrees());
 
         // Motor electrical data
-        SmartDashboard.putNumber("intake/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("intake/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("intake/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("intake/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
 
         // Raw sensor/debug
-        // SmartDashboard.putNumber("intake/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
+        // Telemetry.log("intake/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
     }
 
     public void setPositionToDeployed() {

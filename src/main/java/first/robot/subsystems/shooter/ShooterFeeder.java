@@ -6,6 +6,9 @@
 
 package first.robot.subsystems.shooter;
 
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.telemetry.Telemetry;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -16,8 +19,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import first.robot.Constants;
 
 public class ShooterFeeder extends SubsystemBase {
@@ -116,19 +117,19 @@ public class ShooterFeeder extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("kicker/currentRPM", getKickerRPM()); 
-        SmartDashboard.putNumber("feeder/currentRPM", getFeederRPM()); 
+        Telemetry.log("kicker/currentRPM", getKickerRPM()); 
+        Telemetry.log("feeder/currentRPM", getFeederRPM()); 
         
         // Kicker state
-        SmartDashboard.putNumber("kicker/goalRPM", m_kickerGoalRPM);
-        SmartDashboard.putNumber("kicker/statorCurrent", m_motorKicker.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("kicker/supplyCurrent", m_motorKicker.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("kicker/goalRPM", m_kickerGoalRPM);
+        Telemetry.log("kicker/statorCurrent", m_motorKicker.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("kicker/supplyCurrent", m_motorKicker.getSupplyCurrent().getValueAsDouble());
 
         // Feeder state
-        SmartDashboard.putNumber("feeder/goalRPM", m_feederGoalRPM);
-        SmartDashboard.putNumber("feeder/statorCurrent", m_motorFeeder.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("feeder/supplyCurrent", m_motorFeeder.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("feeder/voltage", m_motorFeeder.getMotorVoltage().getValueAsDouble());
+        Telemetry.log("feeder/goalRPM", m_feederGoalRPM);
+        Telemetry.log("feeder/statorCurrent", m_motorFeeder.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("feeder/supplyCurrent", m_motorFeeder.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("feeder/voltage", m_motorFeeder.getMotorVoltage().getValueAsDouble());
     }
     
     public double getKickerRPM(){

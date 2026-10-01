@@ -4,11 +4,13 @@
 
 package first.robot.subsystems;
 
+import org.wpilib.command2.SubsystemBase;
 // import org.wpilib.hardware.power.PowerDistribution;
 import org.wpilib.framework.RobotBase;
+import org.wpilib.hardware.bus.CANPort;
 import org.wpilib.system.RobotController;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
+import org.wpilib.telemetry.Telemetry;
+
 import first.robot.utilities.HubShiftUtil;
 
 public class DataLogger extends SubsystemBase {
@@ -20,12 +22,12 @@ public class DataLogger extends SubsystemBase {
     @Override
     public void periodic() {
         // Power
-        // SmartDashboard.putNumber("power/totalCurrent", m_powerDist.getTotalCurrent());
-        SmartDashboard.putNumber("power/batteryVoltage", RobotController.getBatteryVoltage());
+        // Telemetry.log("power/totalCurrent", m_powerDist.getTotalCurrent());
+        Telemetry.log("power/batteryVoltage", RobotController.getBatteryVoltage());
 
         // Network
-        SmartDashboard.putNumber("network/CAN Bus Utilization",
-                RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus(0).percentBusUtilization);
+        Telemetry.log("network/CAN0 Bus Utilization",
+                RobotBase.isSimulation() ? 0.0 : RobotController.getCANStatus(CANPort.CAN_D0).percentBusUtilization);
 
         HubShiftUtil.ShiftInfo officialShiftInfo = HubShiftUtil.getOfficialShiftInfo();
         HubShiftUtil.ShiftInfo shiftedShiftInfo = HubShiftUtil.getShiftedShiftInfo(HubShiftUtil.getProjectileLeadTimeSec());
@@ -34,17 +36,17 @@ public class DataLogger extends SubsystemBase {
         boolean clearToShoot = hubTimingRelevant && shiftedShiftInfo.active();
 
         // SmartDashboard
-        SmartDashboard.putNumber("shoot/matchElapsedSec", HubShiftUtil.getMatchElapsedSec());
-        SmartDashboard.putNumber("shoot/matchRemainingSec", HubShiftUtil.getMatchRemainingSec());
-        SmartDashboard.putNumber("shoot/hubShiftElapsedSec", shiftedShiftInfo.elapsedTimeSec());
-        SmartDashboard.putNumber("shoot/hubShiftRemainingSec", shiftedShiftInfo.remainingTimeSec());
-        SmartDashboard.putBoolean("shoot/hubActiveNow", hubActiveNow);
-        SmartDashboard.putBoolean("shoot/clearToShoot", clearToShoot);
-        SmartDashboard.putBoolean("shoot/hubTimingRelevant", hubTimingRelevant);
+        Telemetry.log("shoot/matchElapsedSec", HubShiftUtil.getMatchElapsedSec());
+        Telemetry.log("shoot/matchRemainingSec", HubShiftUtil.getMatchRemainingSec());
+        Telemetry.log("shoot/hubShiftElapsedSec", shiftedShiftInfo.elapsedTimeSec());
+        Telemetry.log("shoot/hubShiftRemainingSec", shiftedShiftInfo.remainingTimeSec());
+        Telemetry.log("shoot/hubActiveNow", hubActiveNow);
+        Telemetry.log("shoot/clearToShoot", clearToShoot);
+        Telemetry.log("shoot/hubTimingRelevant", hubTimingRelevant);
 
         // RobotLog
-        SmartDashboard.putString("shoot/hubShiftState", officialShiftInfo.currentShift().name());
-        SmartDashboard.putString("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
-        SmartDashboard.putNumber("shoot/projectileLeadTimeSec", HubShiftUtil.getProjectileLeadTimeSec());
+        Telemetry.log("shoot/hubShiftState", officialShiftInfo.currentShift().name());
+        Telemetry.log("shoot/shiftedHubShiftState", shiftedShiftInfo.currentShift().name());
+        Telemetry.log("shoot/projectileLeadTimeSec", HubShiftUtil.getProjectileLeadTimeSec());
     }
 }

@@ -12,15 +12,16 @@ import java.util.List;
 import java.util.Objects;
 
 import org.wpilib.command2.Command;
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.command2.sysid.SysIdRoutine.Direction;
 import org.wpilib.driverstation.MatchState;
+import org.wpilib.driverstation.XboxController;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.math.geometry.Pose2d;
-import org.wpilib.math.util.MathUtil;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -47,23 +48,23 @@ public class RobotContainerTestBot extends RobotContainer {
     private final SwerveRequest.SwerveDriveBrake m_brakeRequest = new SwerveRequest.SwerveDriveBrake();
     // private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry m_logger = new Telemetry(MAX_SPEED);
+    private final SwerveTelemetry m_logger = new SwerveTelemetry(MAX_SPEED);
 
     private AutoCommandInterface m_autoCommand;
     private AutoVisualizer m_autoVisualizer = null;
 
-    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
-    // private final CommandJoystick m_farm = new CommandJoystick(1);
+    private final CommandXboxController m_driverController = new CommandXboxController(0);
+    // private final CommandGenericHID m_farm = new CommandGenericHID(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AprilTagVision m_aprilTagVision = new AprilTagVision(Robot.RobotType.TESTBOT, m_logger.getField2d());
 
-    private final SendableChooser<String> m_chosenFieldSide = new SendableChooser<>();
+    private final Selectable<String> m_chosenFieldSide = new Selectable<>();
     private int m_autoSelectionCode = Integer.MIN_VALUE; 
     
     public RobotContainerTestBot() {
         if (Robot.isSimulation()) {
-            DriverStationBackend.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionAlert(true);
         }
         
         m_drivetrain = new CommandSwerveDrivetrain(
@@ -80,10 +81,10 @@ public class RobotContainerTestBot extends RobotContainer {
     }
 
     private void configureAutos() {
-        m_chosenFieldSide.setDefaultOption("Depot Side", "Depot Side");
-        m_chosenFieldSide.addOption("Outpost Side", "Outpost Side");
+        m_chosenFieldSide.addDefault("Depot Side", "Depot Side");
+        m_chosenFieldSide.add("Outpost Side", "Outpost Side");
 
-        SmartDashboard.putData("Field Side", m_chosenFieldSide);
+        Tunables.publish("Field Side", m_chosenFieldSide);
     }
 
     private void configureBindings() {
@@ -96,6 +97,9 @@ public class RobotContainerTestBot extends RobotContainer {
             m_drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
+        // 2027 code supports deadband directly in the controller
+        setDeadband(m_driverController.getController(), JOYSTICK_DEADBAND);
+
         // lock wheels
         m_driverController.a().whileTrue(m_drivetrain.applyRequest(() -> m_brakeRequest));
         // m_driverController.b().whileTrue(drivetrain.applyRequest(() ->
@@ -104,10 +108,11 @@ public class RobotContainerTestBot extends RobotContainer {
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
-        m_driverController.back().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdDynamic(Direction.kForward));
-        m_driverController.back().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdDynamic(Direction.kReverse));
-        m_driverController.start().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.kForward));
-        m_driverController.start().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // ** Alpha 7 check the correct mapping of these buttons.
+        m_driverController.menu().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdDynamic(Direction.FORWARD));
+        m_driverController.menu().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdDynamic(Direction.REVERSE));
+        m_driverController.view().and(m_driverController.y()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.FORWARD));
+        m_driverController.view().and(m_driverController.x()).whileTrue(m_drivetrain.sysIdQuasistatic(Direction.REVERSE));
 
         // Reset the field-centric heading on left bumper press.
         m_driverController.leftBumper().onTrue(m_drivetrain.runOnce(m_drivetrain::seedFieldCentric));
@@ -138,7 +143,7 @@ public class RobotContainerTestBot extends RobotContainer {
             m_autoVisualizer = new AutoVisualizer(m_drivetrain.getPPRobotConfig());
             m_autoCommand = CoreAuto.getInstance(pathFiles, m_drivetrain, isDepotSide, null, m_autoVisualizer);
 
-            SmartDashboard.putString("Selected Auto", "TestBot Auto");
+            Telemetry.log("Selected Auto", "TestBot Auto");
             m_autoVisualizer.registerAndStart(m_logger.getField2d());
         }
 
@@ -174,8 +179,20 @@ public class RobotContainerTestBot extends RobotContainer {
             );
     }
 
+    private void setDeadband(XboxController controller, double deadband) 
+    {
+        controller.setLeftXDeadband(deadband);
+        controller.setLeftYDeadband(deadband);
+
+        controller.setRightXDeadband(deadband);
+        controller.setRightYDeadband(deadband);
+
+        controller.setLeftTriggerDeadband(deadband);
+        controller.setRightTriggerDeadband(deadband);
+    }
+
     private double conditionAxis(double value) {
-        value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
+        // value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
         // Square the axis, retaining the sign
         return Math.abs(value) * value;
     }

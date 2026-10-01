@@ -4,9 +4,10 @@
 
 package first.robot.subsystems.shooter;
 
-import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.command2.SubsystemBase;
+import org.wpilib.math.geometry.Rotation2d;
+import org.wpilib.telemetry.Telemetry;
+
 import first.robot.utilities.ShooterLookupTable;
 import first.robot.utilities.ShooterLookupTable.ShootValue;
 
@@ -65,8 +66,8 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver tuning controls
-        SmartDashboard.putNumber("shooter/flywheelFudge", m_flyFudge);
-        SmartDashboard.putNumber("shooter/hoodFudge", m_hoodFudgeDegree);
+        Telemetry.log("shooter/flywheelFudge", m_flyFudge);
+        Telemetry.log("shooter/hoodFudge", m_hoodFudgeDegree);
     }
 
     public Flywheel getFlywheel() {
@@ -82,7 +83,7 @@ public class Shooter extends SubsystemBase {
     */
     public void stop() {
         m_flywheel.stop();
-        m_hood.setAngle(Rotation2d.kZero);
+        m_hood.setAngle(Rotation2d.ZERO);
     }
     
     public boolean onTarget() {
