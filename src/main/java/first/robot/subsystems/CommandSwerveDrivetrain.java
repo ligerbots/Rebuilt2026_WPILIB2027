@@ -21,10 +21,11 @@ import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.math.util.Units;
 import org.wpilib.system.Notifier;
 import org.wpilib.system.RobotController;
-import org.wpilib.system.Timer;
 import org.wpilib.telemetry.Telemetry;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.alerts.AlertableCollection;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -49,15 +50,18 @@ import first.robot.subsystems.shooter.Turret;
  * Subsystem so it can easily be used in command-based projects.
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private static final double kSimLoopPeriod = 0.005; // 5 ms
-    private static final double kSimOdometryFrequencyHz = Constants.ROBOT_FREQUENCY_HZ;
+    private static final double SIM_LOOP_PERIOD = 0.004; // 4 ms
+    private static final double SIM_ODOMETRY_FREQUENCY_HZ = Constants.ROBOT_FREQUENCY_HZ;
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
-    /** Blue alliance sees forward as 0 degrees (toward red alliance wall) */
+    /** Alerts for all the devices on the drivetrain */
+    private final AlertableCollection deviceAlerts = new AlertableCollection("Swerve");
+
+    /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d BLUE_ALLIANCE_FORWARD_DIRECTION = Rotation2d.ZERO;
-    /** Red alliance sees forward as 180 degrees (toward blue alliance wall) */
-    private static final Rotation2d RED_ALLIANCE_FORWARD_DIRECTION = Rotation2d.k180deg;    
+    /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
+    private static final Rotation2d RED_ALLIANCE_FORWARD_DIRECTION = Rotation2d.PI;    
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
@@ -158,9 +162,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     ) {
         // The default Phoenix odometry rate is more aggressive than we need for desktop sim,
         // which can cause "stale" status signal warnings from the module Talons.
-        super(drivetrainConstants, Robot.isSimulation() ? kSimOdometryFrequencyHz : 0.0, modules);
+        super(drivetrainConstants, Robot.isSimulation() ? SIM_ODOMETRY_FREQUENCY_HZ : 0.0, modules);
+        registerAlerts();
+
         // setupPathPlanner();
-        if (Robot.isSimulation()) {
+        if (Utils.isSimulation()) {
             startSimThread();
         }
 
@@ -233,6 +239,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     //     m_aprilTagVision = aprilTagVision;
     // }
+
+    @Override
+    public void close() {
+        /* close the sim notifier before closing the drivetrain */
+        if (m_simNotifier != null) {
+            m_simNotifier.close();
+            m_simNotifier = null;
+        }
+        super.close();
+    }
+
+    private void registerAlerts() {
+        /* register alerts for all the devices in the drivetrain */
+        for (final var module : getModules()) {
+            deviceAlerts.withAlertable(module.getDriveMotor())
+                .withAlertable(module.getSteerMotor())
+                .withAlertable(module.getEncoder());
+        }
+        deviceAlerts.withAlertable(getPigeon2());
+    }
 
     @SuppressWarnings("unused")
     private void optimizeCAN() {
@@ -316,21 +342,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        deviceAlerts.report();
     }
 
     private void startSimThread() {
-        m_lastSimTime = Timer.getMonotonicTimestamp();
-
+        m_lastSimTime = Utils.getCurrentTimeSeconds();
         /* Run simulation at a faster rate so PID gains behave more reasonably */
         m_simNotifier = new Notifier(() -> {
-            final double currentTime = Timer.getMonotonicTimestamp();
+            final double currentTime = Utils.getCurrentTimeSeconds();
             double deltaTime = currentTime - m_lastSimTime;
             m_lastSimTime = currentTime;
 
             /* use the measured time delta, get battery voltage from WPILib */
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
-        m_simNotifier.startPeriodic(kSimLoopPeriod);
+        m_simNotifier.startPeriodic(SIM_LOOP_PERIOD);
     }
 
     /**
