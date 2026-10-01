@@ -16,8 +16,9 @@ import org.wpilib.driverstation.MatchState;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.opmode.Autonomous;
 import org.wpilib.opmode.PeriodicOpMode;
-import org.wpilib.smartdashboard.SendableChooser;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.tunable.Selectable;
+import org.wpilib.tunable.Tunables;
+import org.wpilib.telemetry.*;
 
 import com.pathplanner.lib.events.EventTrigger;
 
@@ -35,8 +36,8 @@ public class CompetitionAuto extends PeriodicOpMode {
 
     private final InternalButton m_virtualShootButton = new InternalButton();
 
-    private final SendableChooser<String> m_chosenFieldSide = new SendableChooser<>();
-    private final SendableChooser<String> m_chosenAutoPaths = new SendableChooser<>();
+    private final Selectable<String> m_chosenFieldSide = new Selectable<>();
+    private final Selectable<String> m_chosenAutoPaths = new Selectable<>();
     private final Map<String, List<Object>> m_autoPathOptions = new LinkedHashMap<>();
     private int m_autoSelectionCode = Integer.MIN_VALUE; 
 
@@ -218,24 +219,24 @@ public class CompetitionAuto extends PeriodicOpMode {
                 "Swipe Shoot Alt"
                 ));
 
-        SmartDashboard.putData("Auto Choice", m_chosenAutoPaths);
+        Tunables.publish("Auto Choice", m_chosenAutoPaths);
 
-        m_chosenFieldSide.setDefaultOption("Depot Side", "Depot Side");
-        m_chosenFieldSide.addOption("Outpost Side", "Outpost Side");
-        SmartDashboard.putData("Field Side", m_chosenFieldSide);
+        m_chosenFieldSide.addDefault("Depot Side", "Depot Side");
+        m_chosenFieldSide.add("Outpost Side", "Outpost Side");
+        Tunables.publish("Field Side", m_chosenFieldSide);
 
-        SmartDashboard.putBoolean("autoStatus/runningIntake", false);
-        SmartDashboard.putBoolean("autoStatus/runningShooter", false);
+        Telemetry.log("autoStatus/runningIntake", false);
+        Telemetry.log("autoStatus/runningShooter", false);
 
         configureAutoEventTriggers();
     }
 
     private void configureAutoEventTriggers() {
-        new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", true))));
-        new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand().alongWith(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningIntake", false))));
+        new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand().alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", true))));
+        new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand().alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", false))));
 
         new EventTrigger("Shooter Running").whileTrue(m_robot.shootCommand(ShotType.AUTO));
-        new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", false)));
+        new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> Telemetry.log("autoStatus/runningShooter", false)));
 
      }
 
@@ -265,7 +266,7 @@ public class CompetitionAuto extends PeriodicOpMode {
         m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, driveTrain, isOutpostSide, m_virtualShootButton,
                 m_autoVisualizer);
 
-        SmartDashboard.putString("Selected Auto", selectedAutoName);
+        Telemetry.log("Selected Auto", selectedAutoName);
         m_autoVisualizer.registerAndStart(m_robot.getField2d());
         // System.out.println("*** Build Auto command took " + (Timer.getMonotonicTimestamp() - startT) + " seconds");
 
@@ -275,7 +276,7 @@ public class CompetitionAuto extends PeriodicOpMode {
     public Pose2d getInitialPose() {
         if (m_autoCommand != null)
             return m_autoCommand.getInitialPose();
-        return Pose2d.kZero;
+        return Pose2d.ZERO;
     }    
 
     public void updateAutoPreview() {
@@ -297,9 +298,9 @@ public class CompetitionAuto extends PeriodicOpMode {
     private void addAutoOption(String name, List<Object> pathSteps, boolean isDefault) {
         m_autoPathOptions.put(name, pathSteps);
         if (isDefault) {
-            m_chosenAutoPaths.setDefaultOption(name, name);
+            m_chosenAutoPaths.addDefault(name, name);
         } else {
-            m_chosenAutoPaths.addOption(name, name);
+            m_chosenAutoPaths.add(name, name);
         }
     }
 }

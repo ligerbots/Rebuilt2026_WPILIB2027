@@ -9,7 +9,7 @@ import first.robot.Robot;
 
 @Utility
 public class SystemsCheck extends CompetitionTeleop {
-    static final Pose2d INITIAL_POSE = new Pose2d(2.0, FieldConstants.FIELD_WIDTH/2.0, Rotation2d.kZero);
+    static final Pose2d INITIAL_POSE = new Pose2d(2.0, FieldConstants.FIELD_WIDTH/2.0, Rotation2d.ZERO);
 
     public SystemsCheck(Robot robot) {
         super(robot);

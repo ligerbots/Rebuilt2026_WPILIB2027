@@ -1,6 +1,6 @@
 package first.robot.opmode;
 
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.util.MathUtil;
@@ -39,7 +39,7 @@ public class NonZachTeleop extends CompetitionTeleop {
     @Override
     void driveBindings() {
         // for convenience here, since they are used so frequently below
-        CommandNiDsXboxController driverController = m_robot.getDriverController();
+        CommandXboxController driverController = m_robot.getDriverController();
         CommandSwerveDrivetrain drivetrain = m_robot.getDrivetrain();
 
         drivetrain.setDefaultCommand(

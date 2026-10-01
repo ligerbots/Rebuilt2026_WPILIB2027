@@ -9,7 +9,7 @@ import org.wpilib.command2.InstantCommand;
 import org.wpilib.command2.ParallelCommandGroup;
 import org.wpilib.command2.StartEndCommand;
 import org.wpilib.command2.button.CommandGenericHID;
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.math.util.MathUtil;
@@ -51,7 +51,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
     // different pieces can be overridden
     void driveBindings() {
         // for convenience here, since they are used so frequently below
-        CommandNiDsXboxController driverController = m_robot.getDriverController();
+        CommandXboxController driverController = m_robot.getDriverController();
         CommandSwerveDrivetrain drivetrain = m_robot.getDrivetrain();
 
         drivetrain.setDefaultCommand(
@@ -69,7 +69,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
 
     void mainBindings() {
         // for convenience here, since they are used so frequently below
-        CommandNiDsXboxController driverController = m_robot.getDriverController();
+        CommandXboxController driverController = m_robot.getDriverController();
         CommandGenericHID farmController = m_robot.getFarmController();
         Intake intake = m_robot.getIntake();
         Shooter shooter = m_robot.getShooter();
@@ -99,7 +99,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
         driverController.leftBumper().onTrue(intake.stowCommand());
 
         // lock wheels
-        driverController.back().whileTrue(m_robot.getDrivetrain().applyRequest(() -> m_brakeRequest));
+        driverController.menu().whileTrue(m_robot.getDrivetrain().applyRequest(() -> m_brakeRequest));
 
         // Unjam
         farmController.button(21).whileTrue(unjamCommand());
@@ -111,11 +111,11 @@ public class CompetitionTeleop extends PeriodicOpMode {
         // fixed shots - distance in inches, plus ROBOT angle of turret
         // ladder - robot against the outside of the ladder, intake to the left for the
         // dirver
-        farmController.button(11).whileTrue(m_robot.shootCommand(130.0, Rotation2d.kCCW_90deg));
+        farmController.button(11).whileTrue(m_robot.shootCommand(130.0, Rotation2d.CCW_90DEG));
 
         // corner shot
-        farmController.button(13).whileTrue(m_robot.shootCommand(210.0, Rotation2d.k180deg));
-        // TODO: move all test code to a new OpMode
+        farmController.button(13).whileTrue(m_robot.shootCommand(210.0, Rotation2d.PI));
+
         farmController.button(15).whileTrue(m_robot.shootCommand(ShotType.TEST));
 
         farmController.button(1).onTrue(new InstantCommand(shooter::increaseFlyFudge));
@@ -140,35 +140,8 @@ public class CompetitionTeleop extends PeriodicOpMode {
         farmController.button(8).onTrue(new InstantCommand(() -> shooter.setPassNeutral(false)));
 
         // Reset the field-centric heading on Start press.
-        driverController.start().onTrue(m_robot.getDrivetrain().runOnce(m_robot.getDrivetrain()::seedFieldCentric));
+        driverController.view().onTrue(m_robot.getDrivetrain().runOnce(m_robot.getDrivetrain()::seedFieldCentric));
     }
-
-    // @Override
-    // public void disabledPeriodic() {
-    //     /* Called periodically (on every DS packet) while the robot is disabled. */
-    // }
-
-    // @Override
-    // public void start() {
-    //     /* Called once when the robot is enabled. */
-    // }
-
-    // @Override
-    // public void periodic() {
-    //     /* Called periodically (set time interval) while the robot is enabled. */
-    // }
-
-    // @Override
-    // public void end() {
-    //     /* Called when the robot is disabled (after previously being enabled). */
-    // }
-
-    // @Override
-    // public void close() {
-    //     /*
-    //      * Called when the opmode is de-selected / no additional methods will be called.
-    //      */
-    // }
 
     private double conditionAxis(double value) {
         value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);

@@ -8,15 +8,14 @@ import static org.wpilib.units.Units.*;
 
 import org.wpilib.command2.Command;
 import org.wpilib.command2.CommandScheduler;
-import org.wpilib.command2.button.CommandJoystick;
-import org.wpilib.command2.button.CommandNiDsXboxController;
+import org.wpilib.command2.button.CommandGenericHID;
+import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.driverstation.DriverStation;
 import org.wpilib.driverstation.internal.DriverStationBackend;
 import org.wpilib.framework.OpModeRobot;
 import org.wpilib.hardware.hal.HALUtil;
 import org.wpilib.math.geometry.Rotation2d;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.DataLogManager;
 import org.wpilib.telemetry.Telemetry;
 
@@ -43,10 +42,10 @@ public class Robot extends OpModeRobot {
 
     private final Field2d m_field2d = new Field2d();
 
-    private final Telemetry m_swerveLogger = new Telemetry(MAX_SPEED, m_field2d);
+    private final SwerveTelemetry m_swerveLogger = new SwerveTelemetry(MAX_SPEED, m_field2d);
 
-    private final CommandNiDsXboxController m_driverController = new CommandNiDsXboxController(0);
-    private final CommandJoystick m_farm = new CommandJoystick(1);
+    private final CommandXboxController m_driverController = new CommandXboxController(0);
+    private final CommandGenericHID m_farm = new CommandGenericHID(1);
 
     private final CommandSwerveDrivetrain m_drivetrain;
     private final AprilTagVision m_aprilTagVision;
@@ -79,14 +78,14 @@ public class Robot extends OpModeRobot {
 
     public Robot() {
         if (Robot.isSimulation()) {
-            DriverStationBackend.silenceJoystickConnectionWarning(true);
+            DriverStationBackend.silenceJoystickConnectionAlert(true);
         }
         
         // Enable local logging.
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
 
-        determineRobotType();
+        m_robotType = determineRobotType();
 
         // Create the subsystems (aka Mechanisms)
         // If there are differences between robots, create the correct version here
@@ -113,28 +112,24 @@ public class Robot extends OpModeRobot {
         m_drivetrain.registerTelemetry(m_swerveLogger::telemeterize);
     }
 
-    private void determineRobotType() {
+    private RobotType determineRobotType() {
         // Figure out which roboRio this is, so we know which version of the robot
         //   code to run.
         String serialNum = HALUtil.getSerialNumber();
         Telemetry.log("rioSerialNumber", serialNum);
+
+        RobotType robotType;
         if (serialNum.equals(TESTBOT_SERIAL_NUMBER)) {
-            m_robotType = RobotType.TESTBOT;
+            robotType = RobotType.TESTBOT;
         } else if (serialNum.equals(COMPBOT_SERIAL_NUMBER)) {
-            m_robotType = RobotType.COMPBOT;
+            robotType = RobotType.COMPBOT;
         } else {
             // default to the Test robot unless we're running in simulation
-            m_robotType = isSimulation() ? RobotType.COMPBOT : RobotType.TESTBOT;
+            robotType = isSimulation() ? RobotType.COMPBOT : RobotType.TESTBOT;
         }
-        Telemetry.log("robotType", m_robotType.toString());
+        Telemetry.log("robotType", robotType.toString());
 
-        // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
-        // autonomous chooser on the dashboard.
-        if (m_robotType == RobotType.TESTBOT) {
-            m_robotContainer = new RobotContainerTestBot();
-        } else {
-            m_robotContainer = new RobotContainerCompBot();
-        }
+        return robotType;
     }
 
     // Useful if a subsystem needs to know which chassis
@@ -146,15 +141,15 @@ public class Robot extends OpModeRobot {
         return m_field2d;
     }
 
-    public Telemetry getSwerveLogger() {
+    public SwerveTelemetry getSwerveLogger() {
         return m_swerveLogger;
     }
 
-    public CommandNiDsXboxController getDriverController() {
+    public CommandXboxController getDriverController() {
         return m_driverController;
     }
 
-    public CommandJoystick getFarmController() {
+    public CommandGenericHID getFarmController() {
         return m_farm;
     }
 
