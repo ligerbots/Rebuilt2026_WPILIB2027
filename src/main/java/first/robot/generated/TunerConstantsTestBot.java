@@ -2,6 +2,8 @@ package first.robot.generated;
 
 import static org.wpilib.units.Units.*;
 
+import org.wpilib.hardware.bus.CANPort;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.*;
@@ -68,7 +70,7 @@ public class TunerConstantsTestBot {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
+    public static final CANBus kCANBus = new CANBus(CANPort.CAN_S0);
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
@@ -95,7 +97,7 @@ public class TunerConstantsTestBot {
     private static final Voltage kDriveFrictionVoltage = Volts.of(0.2);
 
     public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
-            .withCANBusName(kCANBus.getName())
+            .withNetwork(kCANBus)
             .withPigeon2Id(kPigeonId)
             .withPigeon2Configs(pigeonConfigs);
 

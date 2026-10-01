@@ -14,7 +14,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.units.measure.Current;
 
 import com.ctre.phoenix6.CANBus;
@@ -161,20 +161,20 @@ public class Turret extends SubsystemBase {
         double currentAngle = getAngle().getDegrees();
 
         // Driver-facing status
-        SmartDashboard.putNumber("turret/currentAngle", currentAngle);
-        SmartDashboard.putNumber("turret/fudgeAngle", m_turretFudgeDegrees);
+        Telemetry.log("turret/currentAngle", currentAngle);
+        Telemetry.log("turret/fudgeAngle", m_turretFudgeDegrees);
 
         // Tracking state
-        SmartDashboard.putNumber("turret/angleError", goal - currentAngle);
+        Telemetry.log("turret/angleError", goal - currentAngle);
 
         // Motor electrical/motion data
-        SmartDashboard.putNumber("turret/voltage", m_turretMotor.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("turret/velocityRPS", m_turretMotor.getVelocity().getValueAsDouble());
-        SmartDashboard.putNumber("turret/accelRPS2", m_turretMotor.getAcceleration().getValueAsDouble());
+        Telemetry.log("turret/voltage", m_turretMotor.getMotorVoltage().getValueAsDouble());
+        Telemetry.log("turret/velocityRPS", m_turretMotor.getVelocity().getValueAsDouble());
+        Telemetry.log("turret/accelRPS2", m_turretMotor.getAcceleration().getValueAsDouble());
 
         // Values for testing and tuning
-        // SmartDashboard.putNumber("turret/crtAngleRaw",getCRTAngleRaw().getDegrees());   
-        // SmartDashboard.putNumber("turret/crtAngle",getCRTAngle().getDegrees());
+        // Telemetry.log("turret/crtAngleRaw",getCRTAngleRaw().getDegrees());   
+        // Telemetry.log("turret/crtAngle",getCRTAngle().getDegrees());
         
         // USE ME FOR TUNING ABSOLUTE ENCODER OFFSETS ONLY:
         // ChineseRemainder.smartDashboardLogABSOffsets(ENCODER_SMALL_TOOTH_COUNT, ENCODER_LARGE_TOOTH_COUNT, 
@@ -205,8 +205,8 @@ public class Turret extends SubsystemBase {
         m_turretMotor.setControl(m_positionControl);
 
         // update these log items right away
-        SmartDashboard.putNumber("turret/shootAngle", m_shootAngle + TURRET_HEADING_OFFSET_DEG);
-        SmartDashboard.putNumber("turret/goalAngle", m_goalDeg + TURRET_HEADING_OFFSET_DEG);
+        Telemetry.log("turret/shootAngle", m_shootAngle + TURRET_HEADING_OFFSET_DEG);
+        Telemetry.log("turret/goalAngle", m_goalDeg + TURRET_HEADING_OFFSET_DEG);
     }
     
     // get angle of turret
@@ -333,7 +333,7 @@ public class Turret extends SubsystemBase {
 
             Translation2d turretLoc = getTurretFieldPosition(robotPose);
 
-            Rotation2d turretHeadingRobot = targetVector.getAngle();
+            Rotation2d turretHeadingRobot = targetVector.getAngle().get();
             Rotation2d turretHeadingField = turretHeadingRobot.rotateBy(robotPose.getRotation());
 
             Translation2d robotEndLoc = turretLoc.plus(new Translation2d(targetVector.getNorm(), turretHeadingField));
@@ -345,15 +345,15 @@ public class Turret extends SubsystemBase {
                     new Pose2d(turretLoc, turretHeadingField),
                     new Pose2d(robotEndLoc, turretHeadingField)
             );
-            m_field.getObject("shotTarget").setPose(new Pose2d(robotEndLoc, Rotation2d.kZero));
+            m_field.getObject("shotTarget").setPose(new Pose2d(robotEndLoc, Rotation2d.ZERO));
 
             m_field.getObject("robotHeading").setPoses(
-                    new Pose2d(robotEndLoc, robotMotion.getAngle()),
-                    new Pose2d(robotVecEndLoc, robotMotion.getAngle()) 
+                    new Pose2d(robotEndLoc, robotMotion.getAngle().get()),
+                    new Pose2d(robotVecEndLoc, robotMotion.getAngle().get()) 
             );
             m_field.getObject("centripetalHeading").setPoses(
-                    new Pose2d(robotVecEndLoc, centripetalMotion.getAngle()),
-                    new Pose2d(centripetalEndLoc, centripetalMotion.getAngle())  
+                    new Pose2d(robotVecEndLoc, centripetalMotion.getAngle().get()),
+                    new Pose2d(centripetalEndLoc, centripetalMotion.getAngle().get())  
             );
         } catch (Exception e) {
             // bad! log this and keep going
@@ -371,23 +371,4 @@ public class Turret extends SubsystemBase {
     public static Translation2d getTurretFieldPosition(Pose2d robotPose) {
         return TURRET_OFFSET.rotateBy(robotPose.getRotation()).plus(robotPose.getTranslation());
     }
-    
-    // private static void runTests() {
-    //     Translation2d position = FieldConstants.HUB_POSITION_BLUE.minus(new Translation2d(1.0, 0.5));
-
-    //     for (double angle = 0; angle < 360; angle += 45.0) {
-    //         System.out.println("Angle = " + angle);
-
-    //         Pose2d robot = new Pose2d(position, Rotation2d.fromDegrees(angle));
-
-    //         Translation2d t1 = getTranslationToGoalOld(robot, FieldConstants.HUB_POSITION_BLUE);
-    //         System.out.println("getT2G: " + t1);
-    //         Translation2d t2 = getTranslationToGoal(robot, FieldConstants.HUB_POSITION_BLUE);
-    //         System.out.println("getT2TPaul: " + t2);
-    //     }
-    // }
-
-    // public static void main(String[] args) {
-    //     runTests();
-    // }
 }

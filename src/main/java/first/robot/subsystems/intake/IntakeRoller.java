@@ -8,6 +8,10 @@ package first.robot.subsystems.intake;
 
 import static org.wpilib.units.Units.Amps;
 
+import org.wpilib.command2.SubsystemBase;
+import org.wpilib.telemetry.Telemetry;
+import org.wpilib.units.measure.Current;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -18,9 +22,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import org.wpilib.units.measure.Current;
-import org.wpilib.smartdashboard.SmartDashboard;
-import org.wpilib.command2.SubsystemBase;
 import first.robot.Constants;
 
 public class IntakeRoller extends SubsystemBase {
@@ -89,16 +90,16 @@ public class IntakeRoller extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("intake/RPM", getRPM()); 
+        Telemetry.log("intake/RPM", getRPM()); 
         
         // Commanded state
-        SmartDashboard.putNumber("intake/goalRPM", m_goalRPM);
-        SmartDashboard.putNumber("intake/voltageFudge", m_intakeRPMScale);
+        Telemetry.log("intake/goalRPM", m_goalRPM);
+        Telemetry.log("intake/voltageFudge", m_intakeRPMScale);
 
         // Motor electrical data
-        SmartDashboard.putNumber("intake/voltage", m_motor.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("intake/rollerSupply", m_motor.getSupplyCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("intake/rollerStator", m_motor.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("intake/voltage", m_motor.getMotorVoltage().getValueAsDouble());
+        Telemetry.log("intake/rollerSupply", m_motor.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("intake/rollerStator", m_motor.getStatorCurrent().getValueAsDouble());
     }
          
     public double getRPM(){

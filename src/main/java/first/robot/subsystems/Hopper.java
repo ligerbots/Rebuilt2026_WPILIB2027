@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.math.kinematics.ChassisVelocities;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.units.measure.Current;
 
 import com.ctre.phoenix6.CANBus;
@@ -89,19 +89,19 @@ public class Hopper extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("hopper/RPM", getRPM());
+        Telemetry.log("hopper/RPM", getRPM());
 
         // Commanded state
-        SmartDashboard.putNumber("hopper/goalRPM", m_goalRPM);
+        Telemetry.log("hopper/goalRPM", m_goalRPM);
 
         // Motor electrical data
-        SmartDashboard.putNumber("hopper/voltage", m_motor.getMotorVoltage().getValueAsDouble());
-        SmartDashboard.putNumber("hopper/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
-        SmartDashboard.putNumber("hopper/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
+        Telemetry.log("hopper/voltage", m_motor.getMotorVoltage().getValueAsDouble());
+        Telemetry.log("hopper/statorCurrent", m_motor.getStatorCurrent().getValueAsDouble());
+        Telemetry.log("hopper/supplyCurrent", m_motor.getSupplyCurrent().getValueAsDouble());
 
         // Feed compensation
-        SmartDashboard.putNumber("hopper/feedCompPerpendicularSpeedMps", getPerpendicularIntakeSpeedMetersPerSecond());
-        SmartDashboard.putNumber("hopper/feedCompRPM", getFeedRPMCompensation());
+        Telemetry.log("hopper/feedCompPerpendicularSpeedMps", getPerpendicularIntakeSpeedMetersPerSecond());
+        Telemetry.log("hopper/feedCompRPM", getFeedRPMCompensation());
     }
     
     public void intake(){

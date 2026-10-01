@@ -3,7 +3,7 @@ package first.robot.utilities;
 import java.util.Random;
 
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 
 /**
  * Implements Chinese Remainder Theorem to determine absolute encoder positions from two relative encoders
@@ -85,15 +85,15 @@ public class ChineseRemainder {
     */
     public static void smartDashboardLogABSOffsets(int gear1teeth, int gear2teeth, double gear1rotations, double gear2rotations) {
         // TODO: Make sure abs encoders wrap in other logic bc they may be big
-        double middleTeeth = (gear1teeth * gear2teeth) / 2;
+        double middleTeeth = (gear1teeth * gear2teeth) / 2.0;
 
         double gear1remainder = middleTeeth % gear1teeth;
         double gear1offsetToApply = gear1remainder / gear1teeth - gear1rotations;
-        SmartDashboard.putNumber("CRT/abs1OffsetRotation", gear1offsetToApply);
+        Telemetry.log("CRT/abs1OffsetRotation", gear1offsetToApply);
 
         double gear2remainder = middleTeeth % gear2teeth;
         double gear2offsetToApply = gear2remainder / gear2teeth - gear2rotations;
-        SmartDashboard.putNumber("CRT/abs2OffsetRotation", gear2offsetToApply);
+        Telemetry.log("CRT/abs2OffsetRotation", gear2offsetToApply);
     }
 
     private static double wrapRotation(double rot) {

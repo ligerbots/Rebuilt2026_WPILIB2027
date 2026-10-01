@@ -27,6 +27,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import org.wpilib.driverstation.DriverStationErrors;
+import org.wpilib.fields.Field;
+import org.wpilib.fields.Fields;
 import org.wpilib.framework.RobotBase;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.math.geometry.Pose3d;
@@ -41,16 +43,14 @@ import org.wpilib.math.numbers.N3;
 import org.wpilib.math.util.MathUtil;
 import org.wpilib.math.util.Units;
 import org.wpilib.smartdashboard.Field2d;
-import org.wpilib.smartdashboard.SmartDashboard;
 import org.wpilib.system.Timer;
-import org.wpilib.vision.apriltag.AprilTagFieldLayout;
-import org.wpilib.vision.apriltag.AprilTagFields;
+import org.wpilib.telemetry.Telemetry;
 
 import first.robot.Constants;
 import first.robot.Robot.RobotType;
 
 public class AprilTagVision {
-    static final AprilTagFields APRILTAG_FIELD = AprilTagFields.k2026RebuiltAndymark;
+    static final Fields APRILTAG_FIELD = Fields.FRC_2026_REBUILT_ANDY_MARK;
 
     // static final String CUSTOM_FIELD = "2025-reefscape-andymark_custom.json"; // old
 
@@ -110,7 +110,7 @@ public class AprilTagVision {
         }
     };
 
-    private AprilTagFieldLayout m_aprilTagFieldLayout;
+    private Field m_aprilTagFieldLayout;
     private final Field2d m_field;
 
     // Simulation support
@@ -119,12 +119,12 @@ public class AprilTagVision {
 
     public AprilTagVision(RobotType robotType, Field2d field) {
         try {
-            m_aprilTagFieldLayout = AprilTagFieldLayout.loadField(APRILTAG_FIELD);
-            SmartDashboard.putString("aprilTagVision/field", APRILTAG_FIELD.toString());
+            m_aprilTagFieldLayout = APRILTAG_FIELD.loadField();
+            Telemetry.log("aprilTagVision/field", APRILTAG_FIELD.toString());
 
             // String fieldpath = Filesystem.getDeployDirectory().getPath() + "/" + CUSTOM_FIELD;
             // m_aprilTagFieldLayout = new AprilTagFieldLayout(fieldpath);
-            // SmartDashboard.putString("aprilTagVision/field", CUSTOM_FIELD);
+            // Telemetry.log("aprilTagVision/field", CUSTOM_FIELD);
         } catch (UncheckedIOException e) {
             System.out.println("Unable to load AprilTag layout " + e.getMessage());
             m_aprilTagFieldLayout = null;
@@ -198,7 +198,7 @@ public class AprilTagVision {
             ArrayList<CameraMeasurement> camFrames = new ArrayList<CameraMeasurement>();
             for (Camera cam : m_cameras) {
                 boolean isConnected = cam.photonCamera.isConnected();
-                SmartDashboard.putBoolean("aprilTagVision/" + cam.photonCamera.getName(), isConnected);
+                Telemetry.log("aprilTagVision/" + cam.photonCamera.getName(), isConnected);
                 if (!isConnected)
                     continue;
 
@@ -279,9 +279,9 @@ public class AprilTagVision {
                         globalMeasurements.add(pose);
 
                         // // Debugging logging
-                        // SmartDashboard.putNumber("aprilTagVision/poseEstDX", pose.getX() - currentPose.getX());
-                        // SmartDashboard.putNumber("aprilTagVision/poseEstDY", pose.getY() - currentPose.getY());
-                        // SmartDashboard.putNumber("aprilTagVision/poseEstDR", pose.getRotation().getDegrees() - currentPose.getRotation().getDegrees());
+                        // Telemetry.log("aprilTagVision/poseEstDX", pose.getX() - currentPose.getX());
+                        // Telemetry.log("aprilTagVision/poseEstDY", pose.getY() - currentPose.getY());
+                        // Telemetry.log("aprilTagVision/poseEstDR", pose.getRotation().getDegrees() - currentPose.getRotation().getDegrees());
                     }
                 } catch (Exception e) {
                     // bad! log this and keep going

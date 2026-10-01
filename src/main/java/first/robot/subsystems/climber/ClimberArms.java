@@ -5,17 +5,17 @@
 package first.robot.subsystems.climber;
 
 import org.wpilib.command2.SubsystemBase;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.Slot1Configs;
+import org.wpilib.telemetry.Telemetry;
+
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.Slot1Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-
-import org.wpilib.smartdashboard.SmartDashboard;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import first.robot.Constants;
 
@@ -76,8 +76,8 @@ public class ClimberArms extends SubsystemBase {
 
         //TODO comment out when no longer testing
 
-        SmartDashboard.putNumber("ClimberArms/setLeft", 0);
-        SmartDashboard.putNumber("ClimberArms/setRight", 0);
+        Telemetry.log("ClimberArms/setLeft", 0);
+        Telemetry.log("ClimberArms/setRight", 0);
 
         TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
 
@@ -127,13 +127,13 @@ public class ClimberArms extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("ClimberArms/onTargetLeft", onTarget(MotorSelection.LEFT));
-        SmartDashboard.putNumber("ClimberArms/goalDistanceLeft", m_goalDistanceLeft);
-        SmartDashboard.putNumber("ClimberArms/currentDistanceLeft", getCurrentDistance(MotorSelection.LEFT));
+        Telemetry.log("ClimberArms/onTargetLeft", onTarget(MotorSelection.LEFT));
+        Telemetry.log("ClimberArms/goalDistanceLeft", m_goalDistanceLeft);
+        Telemetry.log("ClimberArms/currentDistanceLeft", getCurrentDistance(MotorSelection.LEFT));
         
-        SmartDashboard.putBoolean("ClimberArms/onTargetRight", onTarget(MotorSelection.RIGHT));
-        SmartDashboard.putNumber("ClimberArms/goalDistanceRight", m_goalDistanceRight);
-        SmartDashboard.putNumber("ClimberArms/currentDistanceRight", getCurrentDistance(MotorSelection.RIGHT));
+        Telemetry.log("ClimberArms/onTargetRight", onTarget(MotorSelection.RIGHT));
+        Telemetry.log("ClimberArms/goalDistanceRight", m_goalDistanceRight);
+        Telemetry.log("ClimberArms/currentDistanceRight", getCurrentDistance(MotorSelection.RIGHT));
     }
 
 

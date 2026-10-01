@@ -8,7 +8,7 @@ import static org.wpilib.units.Units.Amps;
 
 import org.wpilib.command2.SubsystemBase;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.smartdashboard.SmartDashboard;
+import org.wpilib.telemetry.Telemetry;
 import org.wpilib.units.measure.Current;
 
 import com.ctre.phoenix6.CANBus;
@@ -86,13 +86,13 @@ public class Hood extends SubsystemBase {
     @Override
     public void periodic() {
         // Driver-facing status
-        SmartDashboard.putNumber("hood/currentAngle", getAngle().getDegrees());
+        Telemetry.log("hood/currentAngle", getAngle().getDegrees());
 
         // Commanded state
-        SmartDashboard.putNumber("hood/goalAngle", m_goalDeg);
+        Telemetry.log("hood/goalAngle", m_goalDeg);
 
         // Raw sensor/debug
-        // SmartDashboard.putNumber("hood/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
+        // Telemetry.log("hood/rawMotorAngle", m_motor.getPosition().getValueAsDouble());
     }
     
     public void setAngle(Rotation2d angle) {
