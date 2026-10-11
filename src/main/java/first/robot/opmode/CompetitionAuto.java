@@ -225,19 +225,18 @@ public class CompetitionAuto extends PeriodicOpMode {
         m_chosenFieldSide.add("Outpost Side", "Outpost Side");
         Tunables.publish("Field Side", m_chosenFieldSide);
 
-        Telemetry.log("autoStatus/runningIntake", false);
-        Telemetry.log("autoStatus/runningShooter", false);
-
         configureAutoEventTriggers();
     }
 
     private void configureAutoEventTriggers() {
-        new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand().alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", true))));
-        new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand().alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", false))));
+        new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand()
+                .alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", true))));
+        new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand()
+                .alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", false))));
 
         new EventTrigger("Shooter Running").whileTrue(m_robot.shootCommand(ShotType.AUTO));
-        new EventTrigger("Shooter Running").onFalse(new InstantCommand(() -> Telemetry.log("autoStatus/runningShooter", false)));
-
+        new EventTrigger("Shooter Running")
+                .onFalse(new InstantCommand(() -> Telemetry.log("autoStatus/runningShooter", false)));
      }
 
     private void updateAutoCommand() {
@@ -263,8 +262,7 @@ public class CompetitionAuto extends PeriodicOpMode {
         boolean isOutpostSide = selectedFieldSide.equals("Outpost Side");
 
         m_autoVisualizer = new AutoVisualizer(driveTrain.getPPRobotConfig());
-        m_autoCommand = CoreAuto.getInstance(selectedAutoPaths, driveTrain, isOutpostSide, m_virtualShootButton,
-                m_autoVisualizer);
+        m_autoCommand = new CoreAuto(selectedAutoPaths, driveTrain, isOutpostSide, m_virtualShootButton, m_autoVisualizer);
 
         Telemetry.log("Selected Auto", selectedAutoName);
         m_autoVisualizer.registerAndStart(m_robot.getField2d());

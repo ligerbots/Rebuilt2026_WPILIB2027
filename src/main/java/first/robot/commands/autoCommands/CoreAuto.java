@@ -10,7 +10,6 @@ import org.wpilib.driverstation.DriverStationErrors;
 import org.wpilib.math.geometry.Pose2d;
 import org.wpilib.telemetry.Telemetry;
 
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import first.robot.FieldConstants;
@@ -19,23 +18,16 @@ import first.robot.utilities.AutoVisualizer;
 
 public class CoreAuto extends AutoCommandInterface {
 
-    protected Pose2d m_initPose;
+    private Pose2d m_initPose;
     private CommandSwerveDrivetrain m_driveTrain;
 
-    PathConstraints constraints = new PathConstraints(
-            4.0, 2.0,
-            Math.toRadians(540), Math.toRadians(720));
-
-    public static CoreAuto getInstance(List<Object> pathSteps, CommandSwerveDrivetrain driveTrain, boolean isOutpostSide,
-            InternalButton virtualShootButton, AutoVisualizer visualizer) {
-        return new CoreAuto(pathSteps, driveTrain, isOutpostSide, virtualShootButton, visualizer);
-    }
+    // PaulR - not sure why this was used
+    // public static CoreAuto getInstance(List<Object> pathSteps, CommandSwerveDrivetrain driveTrain, boolean isOutpostSide,
+    //         InternalButton virtualShootButton, AutoVisualizer visualizer) {
+    //     return new CoreAuto(pathSteps, driveTrain, isOutpostSide, virtualShootButton, visualizer);
+    // }
     
-    /** Creates a new CoreAuto. 
-     * @param m_shooter 
-     * @param m_turret 
-     */
-    private CoreAuto(List<Object> pathSteps, CommandSwerveDrivetrain driveTrain, boolean isOutpostSide,
+    public CoreAuto(List<Object> pathSteps, CommandSwerveDrivetrain driveTrain, boolean isOutpostSide,
             InternalButton virtualShootButton, AutoVisualizer visualizer) {
 
         m_driveTrain = driveTrain;

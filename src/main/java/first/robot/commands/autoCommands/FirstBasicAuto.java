@@ -12,7 +12,7 @@ import first.robot.subsystems.CommandSwerveDrivetrain;
 
 public class FirstBasicAuto extends AutoCommandInterface {
 
-    protected Pose2d m_initPose;
+    private Pose2d m_initPose;
     private CommandSwerveDrivetrain m_driveTrain;
     
     PathConstraints constraints = new PathConstraints(
