@@ -11,13 +11,14 @@ import org.wpilib.command2.StartEndCommand;
 import org.wpilib.command2.button.CommandGenericHID;
 import org.wpilib.command2.button.CommandXboxController;
 import org.wpilib.command2.button.RobotModeTriggers;
+import org.wpilib.driverstation.XboxController;
+import org.wpilib.math.filter.SlewRateLimiter;
 import org.wpilib.math.geometry.Rotation2d;
-import org.wpilib.math.util.MathUtil;
 import org.wpilib.opmode.PeriodicOpMode;
 import org.wpilib.opmode.Teleop;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import first.robot.Robot;
 import first.robot.subsystems.CommandSwerveDrivetrain;
@@ -36,12 +37,35 @@ public class CompetitionTeleop extends PeriodicOpMode {
     // set the swerve wheels in an X pattern
     private final SwerveRequest.SwerveDriveBrake m_brakeRequest = new SwerveRequest.SwerveDriveBrake();
 
+    private SlewRateLimiter m_xLimiter = null;
+    private SlewRateLimiter m_yLimiter = null;
+    private SlewRateLimiter m_rotationLimiter = null;
+
+    private final double m_maxSpeed;
+    private final double m_maxAngularSpeed;
+
     // This is "protected" so that the subclasses can access it
     protected final Robot m_robot;
 
     /** The Robot instance is passed into the opmode via the constructor. */
     public CompetitionTeleop(Robot robot) {
+        this(robot, 0, 0, 1.0);
+    }
+
+    public CompetitionTeleop(Robot robot, double driveMaxSlewRate, double turnMaxSlewRate, double speedScale) {
         m_robot = robot;
+
+        // Extra parameters for more controlled driving
+        m_maxSpeed = Robot.MAX_SPEED * speedScale;
+        m_maxAngularSpeed = Robot.MAX_ANGULAR_RATE * speedScale;
+
+        if (driveMaxSlewRate > 0.0) {
+            m_xLimiter = new SlewRateLimiter(driveMaxSlewRate);
+            m_yLimiter = new SlewRateLimiter(driveMaxSlewRate);
+        }
+        if (turnMaxSlewRate > 0.0) {
+            m_rotationLimiter = new SlewRateLimiter(turnMaxSlewRate);
+        }
 
         driveBindings();
         mainBindings();
@@ -54,11 +78,14 @@ public class CompetitionTeleop extends PeriodicOpMode {
         CommandXboxController driverController = m_robot.getDriverController();
         CommandSwerveDrivetrain drivetrain = m_robot.getDrivetrain();
 
+        // use the built-in deadband feature, but set the scale
+        setDeadband(driverController.getController(), JOYSTICK_DEADBAND);
+
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> m_driveRequest
-                        .withVelocityX(-conditionAxis(driverController.getLeftY()) * Robot.MAX_SPEED)
-                        .withVelocityY(-conditionAxis(driverController.getLeftX()) * Robot.MAX_SPEED)
-                        .withRotationalRate(-conditionAxis(driverController.getRightX()) * Robot.MAX_ANGULAR_RATE)));
+                        .withVelocityX(-conditionAxis(driverController.getLeftY(), m_xLimiter) * m_maxSpeed)
+                        .withVelocityY(-conditionAxis(driverController.getLeftX(), m_yLimiter) * m_maxSpeed)
+                        .withRotationalRate(-conditionAxis(driverController.getRightX(), m_rotationLimiter) * m_maxAngularSpeed)));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -73,7 +100,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
         CommandGenericHID farmController = m_robot.getFarmController();
         Intake intake = m_robot.getIntake();
         Shooter shooter = m_robot.getShooter();
-        
+
         // enable/disable brake mode on the pivot when the robot is disabled
         RobotModeTriggers.disabled().onFalse(new InstantCommand(() -> intake.getPivot().setBrakeMode(false)));
         RobotModeTriggers.disabled().onTrue(
@@ -109,8 +136,7 @@ public class CompetitionTeleop extends PeriodicOpMode {
         driverController.x().whileTrue(unjamHopperCommand());
 
         // fixed shots - distance in inches, plus ROBOT angle of turret
-        // ladder - robot against the outside of the ladder, intake to the left for the
-        // dirver
+        // ladder - robot against the outside of the ladder, intake to the left of the driver
         farmController.button(11).whileTrue(m_robot.shootCommand(130.0, Rotation2d.CCW_90DEG));
 
         // corner shot
@@ -143,16 +169,31 @@ public class CompetitionTeleop extends PeriodicOpMode {
         driverController.view().onTrue(m_robot.getDrivetrain().runOnce(m_robot.getDrivetrain()::seedFieldCentric));
     }
 
-    private double conditionAxis(double value) {
-        value = MathUtil.applyDeadband(value, JOYSTICK_DEADBAND);
+    protected static void setDeadband(XboxController controller, double deadband) {
+        controller.setLeftXDeadband(deadband);
+        controller.setLeftYDeadband(deadband);
+
+        controller.setRightXDeadband(deadband);
+        controller.setRightYDeadband(deadband);
+
+        controller.setLeftTriggerDeadband(deadband);
+        controller.setRightTriggerDeadband(deadband);
+    }
+
+    private double conditionAxis(double value, SlewRateLimiter limiter) {
+        // deadband is handled in the controller
         // Square the axis, retaining the sign
-        return Math.abs(value) * value;
+        double squared = Math.abs(value) * value;
+        if (limiter == null)
+            return squared;
+        return limiter.calculate(squared);
     }
 
     private Command unjamCommand() {
         return new ParallelCommandGroup(
                 new StartEndCommand(m_robot.getHopper()::reverse, m_robot.getHopper()::stop, m_robot.getHopper()),
-                new StartEndCommand(m_robot.getShooterFeeder()::runReverseUnjam, m_robot.getShooterFeeder()::stop, m_robot.getShooterFeeder()),
+                new StartEndCommand(m_robot.getShooterFeeder()::runReverseUnjam, m_robot.getShooterFeeder()::stop,
+                        m_robot.getShooterFeeder()),
                 m_robot.getIntake().outtakeCommand());
     }
 

@@ -185,19 +185,6 @@ public class Robot extends OpModeRobot {
         return m_dataLogger;
     }
 
-    // @Override
-    // public void driverStationConnected() {
-    // }
-
-    // /**
-    //  * This function is called periodically anytime when no opmode is selected,
-    //  * including when the
-    //  * Driver Station is disconnected.
-    //  */
-    // @Override
-    // public void nonePeriodic() {
-    // }
-
     @Override
     public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
@@ -222,32 +209,4 @@ public class Robot extends OpModeRobot {
 
         // new InstantCommand(() -> SmartDashboard.putBoolean("autoStatus/runningShooter", true)));
     }
-
-    // @Override
-    // public void utilityInit() {
-    //     CommandScheduler.getInstance().cancelAll();
-    // }
-
-    // @Override
-    // public void autonomousPeriodic() {}
-
-    // @Override
-    // public void autonomousExit() {}
-
-    // @Override
-    // public void teleopInit() {
-    //     HubShiftUtil.initialize();
-    //     // note: use this here, or in disabledExit(), but no need for both
-    //     // m_robotContainer.clearAutoPreview();
-
-    //     if (m_autonomousCommand != null) {
-    //         CommandScheduler.getInstance().cancel(m_autonomousCommand);
-    //     }
-    // }
-
-    // @Override
-    // public void teleopPeriodic() {}
-
-    // @Override
-    // public void teleopExit() {}
 }
