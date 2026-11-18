@@ -9,6 +9,7 @@ import org.wpilib.math.geometry.Translation2d;
 import org.wpilib.math.kinematics.ChassisVelocities;
 import org.wpilib.smartdashboard.Field2d;
 import org.wpilib.system.Timer;
+import org.wpilib.telemetry.Telemetry;
 
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -47,11 +48,13 @@ public class AutoVisualizer {
         } else {
             m_field.getObject(PREVIEW_ROBOT_NAME).setPose(FieldConstants.flipPose(previewPoseBlue));
         }
+        Telemetry.log("Field", m_field);
     }
 
     public void clear() {
         m_field.getObject(PREVIEW_PATH_NAME).setPoses();
         m_field.getObject(PREVIEW_ROBOT_NAME).setPoses();
+        Telemetry.log("Field", m_field);
     }
 
     public void addPath(PathPlannerPath path) {
