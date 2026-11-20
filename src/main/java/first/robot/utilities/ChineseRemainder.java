@@ -33,11 +33,11 @@ public class ChineseRemainder {
         double bestError1 = Double.MAX_VALUE;
 
         // Search for best fit using encoder 1 as primary reference
-        int searchLimit1 = totalTeeth2;
+        int searchLimit = totalTeeth2;
 
         double teeth1Guess = rotatedTeeth1;
 
-        for (double i = 0; i < searchLimit1; i += 1) {
+        for (double i = 0; i < searchLimit; i += 1) {
             double teeth2ExpectedWithCurrentGuess = teeth1Guess % totalTeeth2;
             double error = Math.abs(rotatedTeeth2 - teeth2ExpectedWithCurrentGuess);
 
@@ -54,11 +54,11 @@ public class ChineseRemainder {
         // Repeat search using encoder 2 as primary reference
         double bestN2 = -1;
         double bestError2 = Double.MAX_VALUE;
-        int searchLimit2 = totalTeeth1;
+        searchLimit = totalTeeth1;
         
         double teeth2Guess = rotatedTeeth2;
 
-        for (double i = 0; i < searchLimit2; i += 1) {
+        for (double i = 0; i < searchLimit; i += 1) {
             double teeth1ExpectedWithCurrentGuess = teeth2Guess % totalTeeth1;
             double error = Math.abs(rotatedTeeth1 - teeth1ExpectedWithCurrentGuess);
 
@@ -76,14 +76,13 @@ public class ChineseRemainder {
     }
 
     /**
-     * SET TURRET TO DESIRED 0 POSITION, THEN CALL THIS TO LOG OFFSETS TO SMARTDASHBOARD
-     * @param bigNTeeth
+     * Log the offsets, assuming that the turret is at the correct 0 position.
      * @param gear1teeth
      * @param gear2teeth
      * @param gear1rotations
      * @param gear2rotations
     */
-    public static void smartDashboardLogABSOffsets(int gear1teeth, int gear2teeth, double gear1rotations, double gear2rotations) {
+    public static void logABSOffsets(int gear1teeth, int gear2teeth, double gear1rotations, double gear2rotations) {
         // TODO: Make sure abs encoders wrap in other logic bc they may be big
         double middleTeeth = (gear1teeth * gear2teeth) / 2.0;
 
@@ -101,6 +100,11 @@ public class ChineseRemainder {
         while (rot < 0.0) rot += 1.0;
         return rot;
     }
+
+    // ----------------------------------------------------------------------
+    // Test code
+    // We probably should run a unit test harness, but this works for now.
+
     /**
      * Runs automated tests to verify the Chinese Remainder Theorem implementation.
      */
@@ -156,7 +160,6 @@ public class ChineseRemainder {
     }
 
     public static void main(String[] args) {
-
         runTests();
     }
 }

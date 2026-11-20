@@ -103,7 +103,8 @@ public class SwerveTelemetry {
 
         /* Publish the pose to a Field2d */
         m_field.setRobotPose(state.Pose);
-
+        Telemetry.log("Field", m_field);
+        
         /* Telemeterize each module state to a Mechanism2d */
         for (int i = 0; i < 4; ++i) {
             m_moduleSpeeds[i].setAngle(state.ModuleVelocities[i].angle);
