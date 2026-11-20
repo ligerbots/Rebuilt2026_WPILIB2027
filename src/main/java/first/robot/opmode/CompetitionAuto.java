@@ -210,7 +210,7 @@ public class CompetitionAuto extends PeriodicOpMode {
                 "Swipe Shoot Alt"
                 ));
 
-         addAutoOption("4946 Triple Swipe Blitz", List.of(
+        addAutoOption("4946 Triple Swipe Blitz", List.of(
                 "4946 First Swipe Blitz",
                 "Swipe Shoot",
                 "Second Swipe",
@@ -231,10 +231,12 @@ public class CompetitionAuto extends PeriodicOpMode {
     private void configureAutoEventTriggers() {
         new EventTrigger("Run Intake").onTrue(m_robot.getIntake().deployAndRollCommand()
                 .alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", true))));
+
         new EventTrigger("Stop Intake").onTrue(m_robot.getIntake().stowCommand()
                 .alongWith(new InstantCommand(() -> Telemetry.log("autoStatus/runningIntake", false))));
 
         new EventTrigger("Shooter Running").whileTrue(m_robot.shootCommand(ShotType.AUTO));
+
         new EventTrigger("Shooter Running")
                 .onFalse(new InstantCommand(() -> Telemetry.log("autoStatus/runningShooter", false)));
      }
@@ -250,8 +252,8 @@ public class CompetitionAuto extends PeriodicOpMode {
         // Only call constructor if the auto selection inputs have changed
         if (m_autoSelectionCode == currentAutoSelectionCode) return;
 
-        // can't do much without a drivetrain
         CommandSwerveDrivetrain driveTrain = m_robot.getDrivetrain();
+        // can't do much without a drivetrain
         if (driveTrain == null) return;
 
         // double startT = Timer.getMonotonicTimestamp();

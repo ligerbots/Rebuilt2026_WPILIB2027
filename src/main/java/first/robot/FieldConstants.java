@@ -35,7 +35,7 @@ public class FieldConstants {
     public static final double TOP_TRENCH_LOWER_Y = FieldConstants.FIELD_WIDTH - BOTTOM_TRENCH_UPPER_Y;
 
     
-    public static final Translation2d HUB_POSITION_BLUE = new Translation2d(Units.inchesToMeters(182.11),Units.inchesToMeters(158.84));
+    public static final Translation2d HUB_POSITION_BLUE = new Translation2d(Units.inchesToMeters(182.11), Units.inchesToMeters(158.84));
     public static final Translation2d PASSING_TARGET_LEFT_BLUE = new Translation2d(Units.inchesToMeters(91.6), Units.inchesToMeters(66));
     public static final Translation2d PASSING_TARGET_RIGHT_BLUE = new Translation2d(Units.inchesToMeters(91.6), Units.inchesToMeters(250));
     

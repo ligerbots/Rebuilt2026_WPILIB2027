@@ -60,8 +60,8 @@ public class Robot extends OpModeRobot {
     @SuppressWarnings("unused")
     private final DataLogger m_dataLogger = new DataLogger();
 
-    public static final String TESTBOT_SERIAL_NUMBER = "0313baff";
-    public static final String COMPBOT_SERIAL_NUMBER = "030fc268";
+    private static final String TESTBOT_SERIAL_NUMBER = "0313baff";
+    private static final String COMPBOT_SERIAL_NUMBER = "030fc268";
 
     public enum RobotType {
         TESTBOT, COMPBOT
